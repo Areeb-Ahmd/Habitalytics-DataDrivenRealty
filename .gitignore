@@ -64,10 +64,11 @@ Thumbs.db
 temp/
 tmp/
 
-# Model files (optional - uncomment if models are too large)
-# *.pkl
-# *.h5
-# *.model
+# Model files (large files excluded)
+# Exclude large pipeline.pkl files (>100MB)
+**/pipeline.pkl
+*.h5
+*.model
 
 # Environment variables
 .env
