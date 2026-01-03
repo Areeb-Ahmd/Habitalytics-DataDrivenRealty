@@ -58,10 +58,11 @@ The platform is built for **home buyers, real estate investors, property sellers
 - Word clouds and feature analysis
 
 ### 🔹 Apartment Recommender
-- Personalized apartment recommendations
-- Location-based filtering with radius search
-- Similarity-based recommendations using cosine similarity
-- Multi-factor property matching (amenities, features, location)
+- Personalized apartment recommendations using content-based filtering
+- Location-based filtering with radius search (in kilometers)
+- **Cosine Similarity**: Multiple similarity matrices (facilities-based, price-based, location-based) combined with weighted scoring
+- **TF-IDF Vectorization**: Property features and amenities converted to vectors for similarity computation
+- Multi-factor property matching (amenities, features, location advantages)
 
 ---
 
@@ -318,9 +319,15 @@ Ensure all required files are present in the `12 WebApp` directory:
 ## 🔄 Data Pipeline
 
 ### 1. Data Collection
-- Web scraping from 99acres.com
-- Extraction of property details (price, area, location, amenities, etc.)
-- Data stored in CSV format
+- **Web Scraping**: Built custom scraper using BeautifulSoup4 and Requests library
+- Extracted property details from 99acres.com including:
+  - Property information (name, type, price, area)
+  - Configuration (bedrooms, bathrooms, balconies, additional rooms)
+  - Location details (sector, address, nearby locations)
+  - Features and amenities (furnishing details, property features)
+  - Property metadata (age/possession, floor number, facing direction)
+- Implemented rate limiting and random delays to prevent IP blocking
+- Data stored in CSV format (flats.csv, houses.csv, appartments.csv)
 
 ### 2. Data Preprocessing
 - Handling missing values
@@ -329,11 +336,12 @@ Ensure all required files are present in the `12 WebApp` directory:
 - Initial cleaning and standardization
 
 ### 3. Feature Engineering
-- Creating derived features
-- Categorical encoding
-- Feature transformations
-- Luxury category classification
-- Floor category creation
+- **Area Feature Extraction**: Extracted Super Built-up, Built-up, and Carpet area from text using regex patterns
+- **Derived Features**: Created luxury category (Low/Medium/High) and floor category (Low/Mid/High) from numerical scores
+- **Additional Rooms**: Extracted binary features for servant room, store room, study room, pooja room from text data
+- **Text Processing**: Used MultiLabelBinarizer to convert amenities and features lists into binary feature matrices
+- **Categorical Encoding**: Applied OrdinalEncoder, OneHotEncoder, and TargetEncoder for different categorical features
+- **Feature Transformations**: Log transformation for target variable to handle price distribution skewness
 
 ### 4. Exploratory Data Analysis (EDA)
 - Univariate analysis
@@ -342,13 +350,14 @@ Ensure all required files are present in the `12 WebApp` directory:
 - Distribution analysis
 
 ### 5. Outlier Detection & Treatment
-- Statistical methods for outlier detection
-- Outlier removal/treatment
-- Data quality improvement
+- **IQR Method**: Used Interquartile Range (IQR) method for outlier detection
+- Statistical analysis of price and price_per_sqft distributions
+- Outlier removal/treatment to improve data quality and model performance
 
 ### 6. Missing Value Imputation
-- Advanced imputation techniques
-- Handling missing categorical and numerical features
+- **Statistical Imputation**: Used median ratios for area-related features (super_built_up_area, built_up_area, carpet_area)
+- Calculated conversion ratios from complete data to impute missing values
+- Handling missing categorical and numerical features with domain-specific strategies
 
 ### 7. Feature Selection
 - Feature importance analysis
@@ -357,10 +366,11 @@ Ensure all required files are present in the `12 WebApp` directory:
 
 ### 8. Model Development
 - Baseline model creation
-- Multiple model comparison
-- Cross-validation
-- Hyperparameter tuning
+- Multiple model comparison (11 regression models tested)
+- 10-fold cross-validation for robust evaluation
+- Hyperparameter tuning using GridSearchCV
 - Model selection based on performance metrics (R², MAE)
+- **Final Model**: Random Forest Regressor (optimized with 500 estimators)
 
 ### 9. Model Deployment
 - Pipeline creation
@@ -371,7 +381,9 @@ Ensure all required files are present in the `12 WebApp` directory:
 
 ## 🤖 Machine Learning Models
 
-The project implements and compares multiple regression models:
+**Final Model**: Random Forest Regressor (optimized with hyperparameter tuning)
+
+The project implements and compares multiple regression models to select the best performing one:
 
 | Model | Description |
 |-------|-------------|
@@ -380,12 +392,23 @@ The project implements and compares multiple regression models:
 | **Ridge** | L2 regularization |
 | **Lasso** | L1 regularization |
 | **Decision Tree** | Tree-based non-linear model |
-| **Random Forest** | Ensemble of decision trees |
+| **Random Forest** ⭐ | Ensemble of decision trees (Final Selected Model) |
 | **Extra Trees** | Extremely Randomized Trees |
 | **Gradient Boosting** | Sequential ensemble method |
 | **AdaBoost** | Adaptive Boosting |
 | **MLP** | Multi-Layer Perceptron neural network |
 | **XGBoost** | Extreme Gradient Boosting |
+
+### Model Selection Process
+- **Evaluation**: All 11 models were evaluated using 10-fold cross-validation
+- **Metrics**: Performance assessed using R² Score and Mean Absolute Error (MAE)
+- **Final Selection**: **Random Forest Regressor** was selected as the final model after comprehensive comparison
+- **Hyperparameter Tuning**: GridSearchCV was used to optimize Random Forest parameters:
+  - `n_estimators`: [50, 100, 200, 300]
+  - `max_depth`: [None, 10, 20, 30]
+  - `max_samples`: [0.1, 0.25, 0.5, 1.0]
+  - `max_features`: [None, 'sqrt']
+- **Final Model**: Random Forest with 500 estimators (optimized hyperparameters)
 
 ### Model Selection Criteria
 - **R² Score** - Coefficient of determination
@@ -393,10 +416,12 @@ The project implements and compares multiple regression models:
 - **Cross-Validation** - 10-fold CV for robust evaluation
 
 ### Preprocessing Pipeline
-- StandardScaler for numerical features
-- OneHotEncoder for categorical features
-- Log transformation for target variable (price)
-- PCA (optional) for dimensionality reduction
+- **StandardScaler** for numerical features (bedrooms, bathrooms, built-up area, etc.)
+- **OrdinalEncoder** for categorical features (property type, sector, balcony, etc.)
+- **OneHotEncoder** for high-cardinality categorical features (sector, agePossession)
+- **TargetEncoder** (category_encoders) for sector encoding
+- **Log transformation** (log1p) for target variable (price) to handle skewness
+- **PCA** (optional) for dimensionality reduction
 
 ---
 

@@ -1,7 +1,8 @@
 import streamlit as st
-import pickle
+import joblib
 import pandas as pd
 import numpy as np
+import pickle
 
 
 def show_price_predictor():
@@ -33,12 +34,11 @@ def show_price_predictor():
         </div>
     """, unsafe_allow_html=True)
 
-    # Load pickled data
+    # Load data and pipeline
     with open('df.pkl', 'rb') as file:
         df = pickle.load(file)
 
-    with open('pipeline.pkl', 'rb') as file:
-        pipeline = pickle.load(file)
+    pipeline = joblib.load("pipeline.joblib")
 
     # Input Section Header with Info Button
     col_header, col_spacer, col_info = st.columns([3, 2, 1])
