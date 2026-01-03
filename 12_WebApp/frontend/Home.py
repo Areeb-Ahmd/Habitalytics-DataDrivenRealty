@@ -220,6 +220,55 @@ def set_background_color_and_text():
         section.main {{
             padding-top: 0rem !important;
         }}
+
+        /* ================= MOBILE FIXES ================= */
+        @media (max-width: 768px) {{
+
+            /* Reduce side padding */
+            div.block-container {{
+                padding: 1rem 1rem !important;
+                max-width: 100% !important;
+            }}
+
+            /* Hero title scaling */
+            h1 {{
+                font-size: 2.4rem !important;
+                letter-spacing: 4px !important;
+                line-height: 1.1 !important;
+                text-align: center !important;
+            }}
+
+            /* Subtitle text */
+            p {{
+                font-size: 1rem !important;
+                letter-spacing: 3px !important;
+                text-align: center !important;
+            }}
+
+            /* Cards padding */
+            div[style*="padding: 2rem"] {{
+                padding: 1.2rem !important;
+            }}
+
+            /* Remove fixed heights */
+            div[style*="height: 100%"] {{
+                height: auto !important;
+            }}
+
+            /* Sidebar width */
+            section[data-testid="stSidebar"] {{
+                width: 85vw !important;
+            }}
+
+            /* Sidebar logo */
+            section[data-testid="stSidebar"] img {{
+                max-width: 90% !important;
+                height: auto !important;
+                margin: 0 auto !important;
+                display: block !important;
+            }}
+        }}
+
         </style>
         """,
         unsafe_allow_html=True
@@ -231,8 +280,13 @@ def display_home():
     # Hero Section
     st.markdown("""
     <div style='text-align: center; padding: 0 0 1rem 0;'>
-        <h1 style='font-size: 4.5rem; font-weight: 900; margin-bottom: 0; 
-                   line-height: 1; letter-spacing: 8px;'>
+        <h1 style="
+            font-size: clamp(2.4rem, 6vw, 4.5rem);
+            font-weight: 900;
+            margin-bottom: 0;
+            line-height: 1.1;
+            letter-spacing: clamp(3px, 1vw, 8px);
+            text-align: center;">
             <span style='color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>HABITA</span><span style='color: #5fcf7c; text-shadow: 2px 2px 4px rgba(95, 207, 124, 0.5);'>LYTICS</span>
         </h1>
         <div style='width: 300px; height: 4px; background: linear-gradient(90deg, #ffffff 0%, #5fcf7c 100%);
@@ -273,7 +327,7 @@ def display_home():
     with col1:
         st.markdown("""
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
-                        height: 100%; border: 2px solid #2a2a40;
+                        border: 2px solid #2a2a40;
                         transition: transform 0.3s ease;'>
                 <h3 style='color: #64B5F6; font-size: 1.4rem; margin-bottom: 1rem;'>
                     🔹Price Predictor
@@ -289,7 +343,7 @@ def display_home():
     with col2:
         st.markdown("""
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
-                        height: 100%; border: 2px solid #2a2a40;
+                        border: 2px solid #2a2a40;
                         transition: transform 0.3s ease;'>
                 <h3 style='color: #64B5F6; font-size: 1.4rem; margin-bottom: 1rem;'>
                     🔹 Analytics Dashboard
@@ -304,7 +358,7 @@ def display_home():
     with col3:
         st.markdown("""
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
-                        height: 100%; border: 2px solid #2a2a40;
+                        border: 2px solid #2a2a40;
                         transition: transform 0.3s ease;'>
                 <h3 style='color: #64B5F6; font-size: 1.4rem; margin-bottom: 1rem;'>
                     🔹 Apartment Recommender
