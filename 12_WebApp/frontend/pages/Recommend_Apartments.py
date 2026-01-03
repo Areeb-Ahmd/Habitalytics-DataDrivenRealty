@@ -1,8 +1,7 @@
 import streamlit as st
 import pickle
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
+import os
 
 def recommendation_model():
     # Hero Section
@@ -39,6 +38,13 @@ def recommendation_model():
     cosine_sim2 = pickle.load(open('datasets/cosine_sim2.pkl', 'rb'))
     cosine_sim3 = pickle.load(open('datasets/cosine_sim3.pkl', 'rb'))
     link_loc = pickle.load(open('datasets/link_loc.pkl', 'rb'))
+    
+    # NEW: Load the pre-scraped images
+    try:
+        images_df = pd.read_csv('datasets/property_images.csv')
+    except FileNotFoundError:
+        st.error("Image database not found. Please ensure property_images.csv is in datasets folder.")
+        images_df = pd.DataFrame(columns=['PropertyName', 'ImageURL'])
 
     # Constants for weighting in the similarity matrix
     weight_1 = 0.5
@@ -84,94 +90,26 @@ def recommendation_model():
     def get_recommendation_df(selected_apartment):
         return recommend_properties_with_scores(selected_apartment, 5)
 
-    # Optimized scraping with mobile headers (Strategy 3 that worked)
-    def fetch_property_page(url):
-        session = requests.Session()
+    # NEW: Image display function using CSV lookup
+    def image_lookup(row):
+        prop_name = row["PropertyName"]
         
-        # Use the mobile headers that worked successfully
-        mobile_headers = {
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1'
-        }
+        # Find the image URL in our pre-loaded CSV
+        img_row = images_df[images_df['PropertyName'] == prop_name]
         
-        try:
-            response = session.get(url, headers=mobile_headers, timeout=60, allow_redirects=True)
-            response.raise_for_status()
-            return response, session
+        img_src = None
+        if not img_row.empty and pd.notna(img_row.iloc[0]['ImageURL']):
+            img_src = img_row.iloc[0]['ImageURL']
             
-        except Exception as e:
-            session.close()
-            raise Exception(f"Failed to fetch page: {e}")
-
-    def image_scrap(row):
-        url = row["Link"]
-        
-        try:
-            # Use the working mobile headers strategy
-            response, session = fetch_property_page(url)
-            
-            # Parse the HTML content of the fetched URL
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Use the working selector that found the image successfully
-            img_element = soup.select_one('img[src*="99acres"]')
-            
-            if img_element and img_element.get('src'):
-                img_src = img_element.get('src')
-                # Handle relative URLs
-                if img_src.startswith('//'):
-                    img_src = 'https:' + img_src
-                elif img_src.startswith('/'):
-                    img_src = 'https://www.99acres.com' + img_src
-                
-                # Optimize image quality by trying to get higher resolution version
-                original_img_src = img_src
-                # Replace common low-res suffixes with higher quality ones
-                if '_med.jpg' in img_src:
-                    img_src = img_src.replace('_med.jpg', '_large.jpg')
-                elif '_small.jpg' in img_src:
-                    img_src = img_src.replace('_small.jpg', '_large.jpg')
-                elif '_thumb.jpg' in img_src:
-                    img_src = img_src.replace('_thumb.jpg', '_large.jpg')
-                elif '.jpg' in img_src and '_large' not in img_src and '_med' not in img_src:
-                    # Try to get a larger version by adding _large suffix
-                    img_src = img_src.replace('.jpg', '_large.jpg')
-                
-                # Try to get location text
-                location_element = soup.select_one('h1 span')
-                if location_element:
-                    location_text = location_element.text.strip()
-                    _ = st.markdown(f"📍 **Location:** {location_text}")
-                
-                st.image(img_src, caption=f'{row["PropertyName"]}', width=400)
-            else:
-                # Debug: Check if the fallback image file exists
-                import os
-                fallback_path = 'datasets/No_images.jpg'
-                if os.path.exists(fallback_path):
-                    st.image(fallback_path, caption="No image available", width=400)
-                else:
-                    st.error(f"Fallback image not found at: {fallback_path}")
-                    st.image('datasets/No_images.jpg', caption="No image available", width=400)
-                
-        except Exception as e:
-            # Debug: Check if the fallback image file exists
-            import os
+        if img_src:
+            st.image(img_src, caption=f'{prop_name}', width=400)
+        else:
+            # Fallback logic
             fallback_path = 'datasets/No_images.jpg'
             if os.path.exists(fallback_path):
-                st.image(fallback_path, caption="Image not available", width=400)
+                st.image(fallback_path, caption="No image available", width=400)
             else:
-                st.error(f"Fallback image not found at: {fallback_path}")
-                st.image('datasets/No_images.jpg', caption="Image not available", width=400)
-        finally:
-            try:
-                session.close()
-            except:
-                pass
+                st.write("Image not available")
 
     # Recommend properties based on location
     st.markdown("""
@@ -222,7 +160,9 @@ def recommendation_model():
                         # Display property name as clickable but styled like regular text
                         _ = st.markdown("---")
                         _ = st.markdown(f'<a href="{row["Link"]}" style="text-decoration: none; color: inherit; font-weight: bold; font-size: 18px;">{row["PropertyName"]}</a>', unsafe_allow_html=True)
-                        image_scrap(row)
+                        
+                        # NEW: Call the lookup function instead of scraper
+                        image_lookup(row)
             else:
                 st.warning("Please select an apartment first.")
     else:
@@ -242,7 +182,5 @@ def recommendation_model():
         </div>
     """, unsafe_allow_html=True)
 
-
-# Call the main function
 if __name__ == "__main__":
     recommendation_model()
