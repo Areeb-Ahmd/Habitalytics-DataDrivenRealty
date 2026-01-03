@@ -158,7 +158,11 @@ def show_price_predictor():
     col1, col2 = st.columns(2, gap="large")
 
     with col1:
-        st.markdown("#### Basic Information")
+        st.markdown("""
+            <h4 style='color: #64B5F6; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;'>
+                Basic Information
+            </h4>
+        """, unsafe_allow_html=True)
         property_type = st.selectbox('Property Type', ['flat', 'house'])
         sector = st.selectbox('Sector', sorted(df['sector'].unique().tolist()))
         bedrooms = float(st.selectbox('Number of Bedrooms', sorted(df['bedRoom'].unique().tolist())))
@@ -167,7 +171,11 @@ def show_price_predictor():
         property_age = st.selectbox('Property Age', sorted(df['agePossession'].unique().tolist()))
 
     with col2:
-        st.markdown("#### Area & Features")
+        st.markdown("""
+            <h4 style='color: #64B5F6; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;'>
+                Area & Features
+            </h4>
+        """, unsafe_allow_html=True)
         built_up_area = float(st.number_input('Built-up Area (in sqft)', min_value=0.0, step=50.0))
         servant_room = float(st.selectbox('Servant Room', [0.0, 1.0]))
         store_room = float(st.selectbox('Store Room', [0.0, 1.0]))

@@ -32,6 +32,23 @@ def set_background_color_and_text():
         f"""
         <style>
        
+        /* Main app background - BLACK */
+        .stApp {{
+            background-color: #000000 !important;
+        }}
+        
+        /* Main content area background - BLACK */
+        section.main {{
+            background-color: #000000 !important;
+        }}
+        
+        div.block-container {{
+            background-color: #000000 !important;
+            padding: 1rem 5rem;
+            max-width: 95%;
+            margin-top: -12px;
+        }}
+       
         /* Sidebar styling */
         section[data-testid="stSidebar"] {{
             background-color: #001f3f !important;
@@ -59,13 +76,70 @@ def set_background_color_and_text():
             border: 2px solid #000000 !important;
         }}
 
-        /* Adjust the width of the main content */
-        div.block-container {{
-            padding: 1rem 5rem; /* Adjust padding for better spacing */
-            max-width: 95%;    /* Increase the width of the main content */
-            margin-top: -12px;
+        /* ===== INPUT FIELD STYLING FOR DARK THEME ===== */
+        
+        /* Selectbox styling - Dark background */
+        .stSelectbox > div > div {{
+            background-color: #1a1a2e !important;
+            border: 1px solid #2a2a4e !important;
         }}
-
+        
+        .stSelectbox label {{
+            color: #ffffff !important;
+        }}
+        
+        .stSelectbox [data-baseweb="select"] {{
+            background-color: #1a1a2e !important;
+        }}
+        
+        .stSelectbox [data-baseweb="select"] > div {{
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+        }}
+        
+        /* Selectbox dropdown menu */
+        [data-baseweb="popover"] {{
+            background-color: #1a1a2e !important;
+        }}
+        
+        [data-baseweb="menu"] {{
+            background-color: #1a1a2e !important;
+        }}
+        
+        [data-baseweb="menu"] li {{
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+        }}
+        
+        [data-baseweb="menu"] li:hover {{
+            background-color: #2a2a4e !important;
+        }}
+        
+        /* Number input styling - Dark background */
+        .stNumberInput > div > div > input {{
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+            border: 1px solid #2a2a4e !important;
+        }}
+        
+        .stNumberInput label {{
+            color: #ffffff !important;
+        }}
+        
+        /* Text input styling - Dark background */
+        .stTextInput > div > div > input {{
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+            border: 1px solid #2a2a4e !important;
+        }}
+        
+        .stTextInput label {{
+            color: #ffffff !important;
+        }}
+        
+        /* Only style Streamlit default text, not markdown with inline styles */
+        /* Don't override inline styles in markdown - removed h1-h6 and p/div/span rules */
+        
         /* Change selectbox focus border to green */
         .stSelectbox [data-baseweb="select"]:focus-within > div {{
             border-color: #5fcf7c !important;
@@ -103,7 +177,6 @@ def set_background_color_and_text():
             box-shadow: 0 0 0 1px #5fcf7c !important;
         }}
 
-
         /* Even more subtle version */
         .stButton > button[kind="primary"] {{
             background-color: #1a3a2a !important;
@@ -112,11 +185,10 @@ def set_background_color_and_text():
         }}
 
         .stButton > button[kind="primary"]:hover {{
-        background-color: #2d5a3d !important;
+            background-color: #2d5a3d !important;
             border: 2px solid #5fcf7c !important;
             box-shadow: 0 0 10px rgba(95, 207, 124, 0.3) !important;
         }}
-
         </style>
         """,
         unsafe_allow_html=True
@@ -160,7 +232,7 @@ def display_home():
 
     # What We Offer Section
     st.markdown("""
-        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0;'>
+        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #ffffff;'>
             What We Offer
         </h2>
     """, unsafe_allow_html=True)
@@ -217,7 +289,7 @@ def display_home():
 
     # Why Habitalytics Section
     st.markdown("""
-        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0;'>
+        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #ffffff;'>
             Why Habitalytics?
         </h2>
     """, unsafe_allow_html=True)
@@ -251,7 +323,7 @@ def display_home():
 
     # Who Benefits Section
     st.markdown("""
-        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0;'>
+        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #ffffff;'>
             Who Benefits from Habitalytics?
         </h2>
     """, unsafe_allow_html=True)
