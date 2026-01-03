@@ -189,6 +189,32 @@ def set_background_color_and_text():
             border: 2px solid #5fcf7c !important;
             box-shadow: 0 0 10px rgba(95, 207, 124, 0.3) !important;
         }}
+
+        html, body {{
+            background-color: #000000 !important;
+        }}
+
+        /* Main Streamlit app viewport */
+        div[data-testid="stAppViewContainer"] {{
+            background-color: #000000 !important;
+        }}
+
+        /* Top header bar */
+        header[data-testid="stHeader"] {{
+            background-color: #000000 !important;
+            box-shadow: none !important;
+            border-bottom: none !important;
+        }}
+
+        /* Toolbar area */
+        div[data-testid="stToolbar"] {{
+            background-color: #000000 !important;
+        }}
+
+        /* Remove spacing pushed by header */
+        header[data-testid="stHeader"] + div {{
+            margin-top: 0 !important;
+        }}
         </style>
         """,
         unsafe_allow_html=True
