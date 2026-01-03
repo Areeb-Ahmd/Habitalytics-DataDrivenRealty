@@ -1,8 +1,9 @@
 import streamlit as st
-import joblib
 import pandas as pd
 import numpy as np
 import pickle
+import requests
+import os
 
 
 def show_price_predictor():
@@ -34,11 +35,14 @@ def show_price_predictor():
         </div>
     """, unsafe_allow_html=True)
 
-    # Load data and pipeline
+    # API endpoint - use environment variable or default
+    # For local: http://localhost:8000
+    # For production: set API_URL environment variable
+    API_URL = os.getenv("API_URL", "http://localhost:8000")
+
+    # Load data for dropdowns only (no model loading)
     with open('df.pkl', 'rb') as file:
         df = pickle.load(file)
-
-    pipeline = joblib.load("pipeline.joblib")
 
     # Input Section Header with Info Button
     col_header, col_spacer, col_info = st.columns([3, 2, 1])
@@ -184,21 +188,39 @@ def show_price_predictor():
         if built_up_area == 0:
             st.error("⚠️ Please enter a valid Built-up Area")
         else:
-            # Form a dataframe
-            input_data = [[property_type, sector, bedrooms, bathroom, balcony, property_age,
-                        built_up_area, servant_room, store_room, furnishing_type,
-                        luxury_category, floor_category]]
+            # Prepare request payload
+            payload = {
+                "property_type": property_type,
+                "sector": sector,
+                "bedRoom": bedrooms,
+                "bathroom": bathroom,
+                "balcony": balcony,
+                "agePossession": property_age,
+                "built_up_area": built_up_area,
+                "servant_room": servant_room,
+                "store_room": store_room,
+                "furnishing_type": furnishing_type,
+                "luxury_category": luxury_category,
+                "floor_category": floor_category
+            }
             
-            columns = ['property_type', 'sector', 'bedRoom', 'bathroom', 'balcony', 'agePossession',
-                    'built_up_area', 'servant room', 'store room', 'furnishing_type',
-                    'luxury_category', 'floor_category']
-            
-            one_df = pd.DataFrame(input_data, columns=columns)
-
-            # Predict
-            base_price = np.expm1(pipeline.predict(one_df))[0]
-            low = base_price - 0.22
-            high = base_price + 0.22
+            # Call FastAPI endpoint
+            try:
+                with st.spinner("Predicting price..."):
+                    response = requests.post(f"{API_URL}/predict", json=payload, timeout=30)
+                    response.raise_for_status()
+                    result = response.json()
+                    
+                    base_price = result["base_price"]
+                    low = result["lower_range"]
+                    high = result["upper_range"]
+            except requests.exceptions.ConnectionError:
+                st.error("⚠️ Cannot connect to prediction service. Please ensure the API server is running.")
+                st.info(f"Trying to connect to: {API_URL}")
+                return
+            except requests.exceptions.RequestException as e:
+                st.error(f"⚠️ Error connecting to prediction service: {str(e)}")
+                return
 
             # Display Results with styling
             st.markdown("<br>", unsafe_allow_html=True)
