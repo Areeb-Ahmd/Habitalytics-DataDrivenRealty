@@ -1,4 +1,4 @@
-# 🏠 Habitalytics - Data-Driven Real Estate Analytics Platform
+# Habitalytics - Real Estate Analytics Platform
 
 <div align="center">
 
@@ -43,22 +43,22 @@ The platform is built for **home buyers, real estate investors, property sellers
 
 ---
 
-## ✨ Features
+## Features
 
-### 🔹 Price Predictor
+### Price Predictor
 - Predict property prices across Gurgaon using ML models
 - Considers location, area, furnishing, amenities, and market trends
 - Provides instant price estimates for buying or renting decisions
 
-### 🔹 Analytics Dashboard
+### Analytics Dashboard
 - Sector-wise interactive visualizations
 - Price trend analysis
 - Property distribution insights
 - Market dynamics exploration
 - Word clouds and feature analysis
 
-### 🔹 Apartment Recommender
-- Personalized apartment recommendations using content-based filtering
+### Property Recommender
+- Personalized property recommendations using content-based filtering
 - Location-based filtering with radius search (in kilometers)
 - **Cosine Similarity**: Multiple similarity matrices (facilities-based, price-based, location-based) combined with weighted scoring
 - **TF-IDF Vectorization**: Property features and amenities converted to vectors for similarity computation
@@ -132,27 +132,35 @@ Habitalytics/
 │   ├── link_loc.pkl
 │   └── appartments.csv
 │
-└── 12 WebApp/
-    ├── Home.py                     # Main Streamlit application
-    ├── requirements.txt             # Python dependencies
-    ├── pipeline.pkl                # ML model pipeline
-    ├── df.pkl                       # Dataset for predictions
-    ├── sector_coordinates.csv       # Sector location data
-    ├── latlong_scraper.py          # Latitude/longitude scraper
-    ├── datasets/                    # All required datasets and models
-    │   ├── cosine_sim1.pkl
-    │   ├── cosine_sim2.pkl
-    │   ├── cosine_sim3.pkl
-    │   ├── data_viz1.csv
-    │   ├── feature_text.pkl
-    │   ├── link_loc.pkl
-    │   ├── location_distance.pkl
-    │   ├── wordcloud_df.pkl
-    │   └── [logo images]
-    └── pages/
-        ├── Price_Predictor.py      # Price prediction page
-        ├── Analysis_App.py         # Analytics dashboard page
-        └── Recommend_Apartments.py # Recommender system page
+└── 12_WebApp/
+    ├── backend/
+    │   ├── api.py                   # FastAPI backend service
+    │   ├── pipeline.joblib         # ML model pipeline
+    │   ├── requirements.txt         # Backend dependencies
+    │   └── README.md                # Backend documentation
+    │
+    └── frontend/
+        ├── Home.py                  # Main Streamlit application
+        ├── requirements.txt         # Frontend dependencies
+        ├── df.pkl                   # Dataset for dropdown options
+        ├── sector_coordinates.csv   # Sector location data
+        ├── latlong_scraper.py       # Latitude/longitude scraper
+        ├── generate_images.py       # Property image generator
+        ├── datasets/                # All required datasets and models
+        │   ├── cosine_sim1.pkl      # Similarity matrix 1
+        │   ├── cosine_sim2.pkl      # Similarity matrix 2
+        │   ├── cosine_sim3.pkl      # Similarity matrix 3
+        │   ├── data_viz1.csv        # Visualization dataset
+        │   ├── feature_text.pkl    # Feature text data
+        │   ├── link_loc.pkl         # Property links mapping
+        │   ├── location_distance.pkl # Location distance matrix
+        │   ├── wordcloud_df.pkl     # Word cloud data
+        │   ├── property_images.csv  # Property image URLs
+        │   └── [logo images]        # Application logos
+        └── pages/
+            ├── Property_Valuation.py    # Price prediction page
+            ├── Analytics_Dashboard.py   # Analytics dashboard page
+            └── Property_Recommender.py # Recommender system page
 ```
 
 ---
@@ -172,10 +180,10 @@ git clone https://github.com/yourusername/Habitalytics.git
 cd Habitalytics
 ```
 
-### Step 2: Navigate to WebApp Directory
+### Step 2: Navigate to Frontend Directory
 
 ```bash
-cd "12 WebApp"
+cd "12_WebApp/frontend"
 ```
 
 ### Step 3: Create Virtual Environment
@@ -192,19 +200,53 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### Step 4: Install Dependencies
+### Step 4: Install Frontend Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 5: Verify Installation
+### Step 5: Setup Backend API (Optional but Recommended)
 
-Ensure all required files are present in the `12 WebApp` directory:
+For the Property Valuation feature to work, you need to run the backend API:
+
+1. Navigate to backend directory:
+   ```bash
+   cd ../backend
+   ```
+
+2. Install backend dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Ensure `pipeline.joblib` is present in the backend directory
+
+4. Run the API server:
+   ```bash
+   python api.py
+   ```
+   Or with uvicorn:
+   ```bash
+   uvicorn api:app --host 0.0.0.0 --port 8000
+   ```
+
+5. Set environment variable for frontend (in a new terminal):
+   ```bash
+   # Windows
+   $env:API_URL="http://localhost:8000"
+   
+   # Linux/Mac
+   export API_URL=http://localhost:8000
+   ```
+
+### Step 6: Verify Installation
+
+Ensure all required files are present in the `12_WebApp/frontend` directory:
 - `Home.py`
-- `pipeline.pkl`
 - `df.pkl`
 - `datasets/` folder with all pickle files and CSVs
+- `pages/` folder with all page modules
 
 ---
 
@@ -221,61 +263,78 @@ Ensure all required files are present in the `12 WebApp` directory:
    source .venv/bin/activate
    ```
 
-2. **Navigate to the WebApp directory**:
+2. **Navigate to the frontend directory**:
    ```bash
-   cd "12 WebApp"
+   cd "12_WebApp/frontend"
+   ```
+   
+3. **Start the backend API** (in a separate terminal, if using Property Valuation):
+   ```bash
+   cd "12_WebApp/backend"
+   python api.py
    ```
 
-3. **Run the Streamlit application**:
+4. **Run the Streamlit application**:
    ```bash
    streamlit run Home.py
    ```
 
-4. **Access the application**:
+5. **Access the application**:
    - The app will automatically open in your default web browser
    - Default URL: `http://localhost:8501`
+   - Backend API (if running): `http://localhost:8000`
 
 ### Using the Application
 
-#### 🏠 Home Page
+#### Home Page
 - Overview of the platform
 - Navigation to different modules
 - Information about features and benefits
 
-#### 💰 Price Predictor
-1. Select property details:
-   - Sector (location)
-   - Property type
-   - Bedrooms, Bathrooms
-   - Built-up area
+#### Property Valuation
+1. **Ensure backend API is running** (see Setup Step 5)
+2. Select property details:
+   - Property type (flat/house)
+   - Sector (location in Gurgaon)
+   - Bedrooms, Bathrooms, Balconies
+   - Built-up area (in sqft)
+   - Property age/Possession status
    - Furnishing type
-   - Age/Possession
-   - Floor category
-   - Balcony count
+   - Floor category (Low/Mid/High)
    - Additional rooms (servant room, store room)
    - Luxury category
+3. Click **"Predict Price"** to get instant price prediction with:
+   - Base price estimate
+   - Lower range (conservative estimate)
+   - Upper range (optimistic estimate)
 
-2. Click **"Predict Price"** to get instant price prediction
+#### Analytics Dashboard
+- **Sector-wise Price Map**: Interactive map showing average prices per sqft across sectors
+- **Features Word Cloud**: Visualize most common amenities by sector
+- **Built-up Area vs Price**: Scatter plots showing price-area relationships
+- **BHK Distribution**: Pie charts showing bedroom configuration distribution
+- **Price Comparison**: Box plots comparing prices across different BHK configurations
+- **Price Distribution**: Side-by-side histograms for houses vs flats
 
-#### 📊 Analytics Dashboard
-- Explore sector-wise average prices
-- View interactive visualizations
-- Analyze property distributions
-- Generate word clouds for property features
-- Explore market trends
-
-#### 🎯 Apartment Recommender
-1. Enter apartment name or select from dropdown
-2. Specify search radius (in km)
-3. Get personalized recommendations based on:
-   - Location proximity
-   - Similar amenities
-   - Property features
-   - Market characteristics
+#### Property Recommender
+1. **Select Location and Radius**:
+   - Choose a location (sector) from dropdown
+   - Set search radius in kilometers
+   - Click "Search" to find properties in the area
+2. **Get Recommendations**:
+   - Select an apartment from the search results
+   - Click "Recommend" to get similar properties
+   - View recommendations with similarity scores
+   - Access property listings on 99acres.com
+3. **Recommendation Factors**:
+   - Location proximity (distance-based)
+   - Similar amenities and features (TF-IDF + Cosine Similarity)
+   - Price range similarity
+   - Property characteristics matching
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 ### Core Technologies
 - **Python 3.x** - Programming language
@@ -316,7 +375,7 @@ Ensure all required files are present in the `12 WebApp` directory:
 
 ---
 
-## 🔄 Data Pipeline
+## Data Pipeline
 
 ### 1. Data Collection
 - **Web Scraping**: Built custom scraper using BeautifulSoup4 and Requests library
@@ -379,7 +438,7 @@ Ensure all required files are present in the `12 WebApp` directory:
 
 ---
 
-## 🤖 Machine Learning Models
+## Machine Learning Models
 
 **Final Model**: Random Forest Regressor (optimized with hyperparameter tuning)
 
@@ -428,38 +487,56 @@ The project implements and compares multiple regression models to select the bes
 ## 🌐 Web Application
 
 ### Architecture
-- **Frontend**: Streamlit (Python-based)
-- **Backend**: Python with scikit-learn
-- **Data Storage**: Pickle files and CSV
+- **Frontend**: Streamlit (Python-based web framework)
+- **Backend**: FastAPI (RESTful API for ML predictions)
+- **Data Storage**: Pickle files (.pkl), CSV files, and Joblib models
+- **Communication**: HTTP REST API between frontend and backend
 
-### Pages
+### Frontend Pages
 
 #### 1. Home (`Home.py`)
 - Landing page with project overview
-- Navigation menu
-- Feature highlights
-- Contact information
+- Navigation menu using `streamlit-option-menu`
+- Feature highlights and benefits
+- Contact information and developer details
+- **Mobile Responsive**: Optimized CSS for mobile devices (≤768px)
 
-#### 2. Price Predictor (`pages/Price_Predictor.py`)
+#### 2. Property Valuation (`pages/Property_Valuation.py`)
 - Interactive form for property details
-- Real-time price prediction
-- Model confidence indicators
+- Real-time price prediction via FastAPI backend
+- Price range display (lower, base, upper)
+- Property summary with all entered details
+- Field guide with tooltips for each input field
 
-#### 3. Analytics Dashboard (`pages/Analysis_App.py`)
-- Interactive maps (sector-wise prices)
-- Statistical visualizations
-- Word clouds
-- Trend analysis
+#### 3. Analytics Dashboard (`pages/Analytics_Dashboard.py`)
+- Interactive maps (Plotly scatter_mapbox) showing sector-wise prices
+- Word clouds for property features by sector
+- Scatter plots (Built-up Area vs Price)
+- Pie charts (BHK distribution)
+- Box plots (Price comparison by BHK)
+- Side-by-side histograms (Price distribution by property type)
 
-#### 4. Apartment Recommender (`pages/Recommend_Apartments.py`)
-- Property search interface
-- Location-based filtering
-- Similarity scoring
-- Recommendation display
+#### 4. Property Recommender (`pages/Property_Recommender.py`)
+- Location-based property search with radius filtering
+- Content-based recommendation system
+- Multiple similarity matrices (weighted combination)
+- Property cards with images, similarity scores, and direct links
+- Integration with 99acres.com listings
+
+### Backend API
+
+#### FastAPI Service (`backend/api.py`)
+- **Endpoints**:
+  - `GET /` - API status and information
+  - `GET /health` - Health check endpoint
+  - `POST /predict` - Property price prediction
+- **CORS**: Enabled for cross-origin requests from Streamlit frontend
+- **Model Loading**: Loads `pipeline.joblib` at startup
+- **Response Format**: JSON with base_price, lower_range, upper_range
 
 ---
 
-## 📊 Dataset Information
+## Dataset Information
 
 ### Data Source
 - **Website**: 99acres.com
@@ -486,7 +563,15 @@ The project implements and compares multiple regression models to select the bes
 ## 🔧 Configuration
 
 ### Environment Variables
-No environment variables required for basic usage.
+
+#### Frontend
+- `API_URL` (optional): Backend API URL (default: `http://localhost:8000`)
+  - Set this if backend is running on a different host/port
+  - Example: `export API_URL=https://your-backend.onrender.com`
+
+#### Backend
+- `PORT` (optional): Server port (default: 8000)
+  - Automatically set by deployment platforms like Railway
 
 ### File Paths
 Ensure all paths in the code match your directory structure:
