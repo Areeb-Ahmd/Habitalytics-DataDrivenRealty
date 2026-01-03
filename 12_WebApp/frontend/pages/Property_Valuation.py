@@ -6,13 +6,13 @@ import requests
 import os
 
 
-def show_price_predictor():
+def show_property_valuation():
     # Hero Section
     st.markdown("""
     <div style='text-align: center; padding: 0 0 1rem 0;'>
         <h1 style='font-size: 3.5rem; font-weight: 900; margin-bottom: 0; 
                    line-height: 1; letter-spacing: 6px;'>
-            <span style='color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>PRICE </span><span style='color: #5fcf7c; text-shadow: 2px 2px 4px rgba(95, 207, 124, 0.5);'>PREDICTOR</span>
+            <span style='color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>PROPERTY </span><span style='color: #5fcf7c; text-shadow: 2px 2px 4px rgba(95, 207, 124, 0.5);'>VALUATION</span>
         </h1>
         <div style='width: 250px; height: 4px; background: linear-gradient(90deg, #ffffff 0%, #5fcf7c 100%);
                     margin: 1rem auto; border-radius: 2px;'></div>
@@ -267,34 +267,74 @@ def show_price_predictor():
 
             # Display Results with styling
             st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Single card containing all 3 prices
             st.markdown("""
-                <div style='background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); 
-                            padding: 1rem; border-radius: 12px; margin: 1rem 0;
-                            border: 2px solid #64B5F6;'>
-                    <h3 style='color: #64B5F6; text-align: center; margin-bottom: 0.5rem; font-size: 2.5rem;'>
-                        Predicted Price Range
-                    </h3>
+                <style>
+                    /* Style metric values to be white and visible */
+                    [data-testid="stMetricValue"] {
+                        color: #ffffff !important;
+                        font-size: 1.8rem !important;
+                        font-weight: 700 !important;
+                    }
+                    
+                    /* Style metric labels */
+                    [data-testid="stMetricLabel"] {
+                        color: #cccccc !important;
+                        font-size: 0.95rem !important;
+                    }
+                    
+                    /* Style metric delta (Estimated badge) */
+                    [data-testid="stMetricDelta"] {
+                        color: #5fcf7c !important;
+                        background-color: rgba(95, 207, 124, 0.2) !important;
+                        border-radius: 6px !important;
+                        padding: 0.25rem 0.5rem !important;
+                    }
+                </style>
             """, unsafe_allow_html=True)
             
-            # Display metrics in columns
-            metric_col1, metric_col2, metric_col3 = st.columns(3)
+            # Single card container for all prices - using HTML structure
+            low_val = round(low, 2)
+            base_val = round(base_price, 2)
+            high_val = round(high, 2)
             
-            with metric_col1:
-                st.metric(label="🔻 Lower Range", value=f"₹ {round(low, 2)} Cr")
-            
-            with metric_col2:
-                st.metric(label="🎯 Base Price", value=f"₹ {round(base_price, 2)} Cr", delta="Estimated")
-            
-            with metric_col3:
-                st.metric(label="🔺 Upper Range", value=f"₹ {round(high, 2)} Cr")
-            
-            st.markdown("</div>", unsafe_allow_html=True)
-            
-            # Additional Info
-            st.info("""
-                💡 **Note:** The predicted price range is based on current market trends and property features. 
-                Actual prices may vary based on specific location advantages, market conditions, and negotiation.
-            """)
+            st.markdown(f"""
+                <div style='background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+                            padding: 1.5rem 1.5rem; border-radius: 16px; margin: 1rem 0;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);'>
+                    <div style='display: flex; justify-content: space-around; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;'>
+                        <div style='flex: 1; min-width: 150px; text-align: center;'>
+                            <div style='color: #cccccc; font-size: 0.95rem; margin-bottom: 0.5rem;'>
+                                🔻 Lower Range
+                            </div>
+                            <div style='color: #ffffff; font-size: 1.8rem; font-weight: 700;'>
+                                ₹ {low_val} Cr
+                            </div>
+                        </div>
+                        <div style='flex: 1; min-width: 150px; text-align: center;'>
+                            <div style='color: #cccccc; font-size: 0.95rem; margin-bottom: 0.5rem;'>
+                                🎯 Base Price
+                            </div>
+                            <div style='color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;'>
+                                ₹ {base_val} Cr
+                            </div>
+                            <div style='color: #5fcf7c; background-color: rgba(95, 207, 124, 0.2); 
+                                        border-radius: 6px; padding: 0.25rem 0.5rem; display: inline-block; font-size: 0.85rem;'>
+                                ↑ Estimated
+                            </div>
+                        </div>
+                        <div style='flex: 1; min-width: 150px; text-align: center;'>
+                            <div style='color: #cccccc; font-size: 0.95rem; margin-bottom: 0.5rem;'>
+                                🔺 Upper Range
+                            </div>
+                            <div style='color: #ffffff; font-size: 1.8rem; font-weight: 700;'>
+                                ₹ {high_val} Cr
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
             
             # Modern Property Summary
             st.markdown("<br>", unsafe_allow_html=True)
@@ -417,4 +457,4 @@ def show_price_predictor():
 
 # Call the main function
 if __name__ == "__main__":
-    show_price_predictor()
+    show_property_valuation()

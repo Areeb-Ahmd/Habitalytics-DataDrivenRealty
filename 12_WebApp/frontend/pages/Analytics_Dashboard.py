@@ -8,7 +8,7 @@ import seaborn as sns
 import ast
 import plotly.graph_objects as go
 
-def show_analysis_app():
+def show_analytics_dashboard():
     # Hero Section
     st.markdown("""
     <div style='text-align: center; padding: 0 0 1rem 0;'>
@@ -391,4 +391,4 @@ def show_analysis_app():
 
 # Call the main function
 if __name__ == "__main__":
-    show_analysis_app()
+    show_analytics_dashboard()

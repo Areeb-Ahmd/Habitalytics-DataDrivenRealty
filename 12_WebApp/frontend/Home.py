@@ -471,7 +471,7 @@ def display_home():
                         border: 2px solid #2a2a40;
                         transition: transform 0.3s ease;'>
                 <h3 style='color: #64B5F6; font-size: 1.4rem; margin-bottom: 1rem;'>
-                    🔹Price Predictor
+                    🔹Property Valuation
                 </h3>
                 <p style='color: #cccccc; line-height: 1.8; font-size: 1rem;'>
                     Predict property prices across Gurugram using ML models trained on location, 
@@ -502,7 +502,7 @@ def display_home():
                         border: 2px solid #2a2a40;
                         transition: transform 0.3s ease;'>
                 <h3 style='color: #64B5F6; font-size: 1.4rem; margin-bottom: 1rem;'>
-                    🔹 Apartment Recommender
+                    🔹 Property Recommender
                 </h3>
                 <p style='color: #cccccc; line-height: 1.8; font-size: 1rem;'>
                     Get <strong>personalized apartment recommendations</strong> based on 
@@ -674,7 +674,7 @@ with st.sidebar:
     
     selected = option_menu(
         menu_title="NAVIGATION",
-        options=["Home", "Price Predictor", "Analytics", "Recommend Apartments"],
+        options=["Home", "Property Valuation", "Analytics Dashboard", "Property Recommender"],
         icons=["house", "clock", "bar-chart", "cpu"],
         default_index=0,
         orientation="vertical",
@@ -772,9 +772,9 @@ def reload_page_modules():
         pass
     
     page_modules = [
-        'pages.Price_Predictor',
-        'pages.Analysis_App', 
-        'pages.Recommend_Apartments'
+        'pages.Property_Valuation',
+        'pages.Analytics_Dashboard', 
+        'pages.Property_Recommender'
     ]
     
     # Reload each page module if it exists
@@ -792,12 +792,12 @@ reload_page_modules()
 # Main content based on selection
 if selected == "Home":
     display_home()
-elif selected == "Price Predictor":
-    from pages.Price_Predictor import show_price_predictor
-    show_price_predictor()
-elif selected == "Analytics":
-    from pages.Analysis_App import show_analysis_app
-    show_analysis_app()
-elif selected == "Recommend Apartments":
-    from pages.Recommend_Apartments import recommendation_model
-    recommendation_model()
+elif selected == "Property Valuation":
+    from pages.Property_Valuation import show_property_valuation
+    show_property_valuation()
+elif selected == "Analytics Dashboard":
+    from pages.Analytics_Dashboard import show_analytics_dashboard
+    show_analytics_dashboard()
+elif selected == "Property Recommender":
+    from pages.Property_Recommender import property_recommender_model
+    property_recommender_model()

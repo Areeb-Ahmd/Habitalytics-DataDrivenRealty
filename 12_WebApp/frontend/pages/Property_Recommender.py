@@ -3,13 +3,13 @@ import pickle
 import pandas as pd
 import os
 
-def recommendation_model():
+def property_recommender_model():
     # Hero Section
     st.markdown("""
     <div style='text-align: center; padding: 0 0 1rem 0;'>
         <h1 style='font-size: 3.5rem; font-weight: 900; margin-bottom: 0; 
                    line-height: 1; letter-spacing: 6px;'>
-            <span style='color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>APARTMENT </span><span style='color: #5fcf7c; text-shadow: 2px 2px 4px rgba(95, 207, 124, 0.5);'>RECOMMENDER</span>
+            <span style='color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>PROPERTY </span><span style='color: #5fcf7c; text-shadow: 2px 2px 4px rgba(95, 207, 124, 0.5);'>RECOMMENDER</span>
         </h1>
         <div style='width: 300px; height: 4px; background: linear-gradient(90deg, #ffffff 0%, #5fcf7c 100%);
                     margin: 1rem auto; border-radius: 2px;'></div>
@@ -232,7 +232,7 @@ def recommendation_model():
     # Recommendation section
     st.markdown("""
         <h2 style='font-size: 1.8rem; font-weight: 600; margin: 1.5rem 0 1rem 0; color: #64B5F6;'>
-            Recommend Apartments
+            Recommend Properties
         </h2>
     """, unsafe_allow_html=True)
     
@@ -378,17 +378,17 @@ def recommendation_model():
                         </p>
                     </div>
                 """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-                <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
-                            padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
-                            border-left: 4px solid #ff6b6b;
-                            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
-                    <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
-                        ⚠️ No apartments available in the selected area. Please adjust your location and radius settings above.
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                        padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                        border-left: 4px solid #ff6b6b;
+                        box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                    ⚠️ No property available in the selected area. Please adjust your location and radius settings above.
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
 
     
     # Footer information
@@ -405,4 +405,4 @@ def recommendation_model():
     """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    recommendation_model()
+    property_recommender_model()
