@@ -118,6 +118,60 @@ def recommendation_model():
         </h2>
     """, unsafe_allow_html=True)
     
+    # Add custom CSS for Search and Recommend buttons and card styling
+    st.markdown("""
+        <style>
+        /* Style Search and Recommend buttons */
+        div[data-testid="column"] button,
+        .stButton > button {
+            background-color: #1a3a2a !important;
+            border: 2px solid #5fcf7c !important;
+            color: #5fcf7c !important;
+            font-weight: 600 !important;
+            padding: 0.5rem 2rem !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .stButton > button:hover {
+            background-color: #2d5a3d !important;
+            border-color: #5fcf7c !important;
+            color: #5fcf7c !important;
+            box-shadow: 0 0 10px rgba(95, 207, 124, 0.3) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        .stButton > button:active {
+            transform: translateY(0) !important;
+        }
+        
+        /* Ensure all text in recommendations is visible */
+        .stMarkdown p,
+        .stMarkdown div,
+        .stMarkdown span {
+            color: #ffffff !important;
+        }
+        
+        /* Card link hover effect */
+        a[href*="99acres"] {
+            transition: all 0.3s ease !important;
+        }
+        
+        /* 99acres button hover - blue */
+        a[href*="99acres"]:hover {
+            background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%) !important;
+            box-shadow: 0 4px 12px rgba(0, 120, 215, 0.4) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        /* Generic listing button hover */
+        a.listing-button:hover {
+            box-shadow: 0 4px 12px rgba(95, 207, 124, 0.4) !important;
+            transform: translateY(-2px) !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
     selected_location = st.selectbox('Location', sorted(location_df.columns.to_list()), index=21)
     radius = st.number_input('Radius in Kms', min_value=0, max_value=330, value=0, step=2)
 
@@ -126,10 +180,53 @@ def recommendation_model():
 
     if st.button('Search'):
         if apartments_list:
-            for key in apartments_list:
-                st.write(f'{key} :  {round(location_df.at[key, selected_location] / 1000, 1)} Kms')
+            # Display results in modern card grid
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Create columns for grid layout (2 columns)
+            num_results = len(apartments_list)
+            cols_per_row = 2
+            
+            for i in range(0, num_results, cols_per_row):
+                cols = st.columns(cols_per_row, gap="medium")
+                
+                for j, col in enumerate(cols):
+                    if i + j < num_results:
+                        key = apartments_list[i + j]
+                        distance = round(location_df.at[key, selected_location] / 1000, 1)
+                        
+                        with col:
+                            st.markdown(f"""
+                                <div style='background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%); 
+                                            padding: 1.2rem; border-radius: 12px; 
+                                            border-left: 3px solid #64B5F6;
+                                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                                            margin-bottom: 1rem;
+                                            transition: transform 0.2s ease;
+                                            cursor: pointer;'>
+                                    <div style='display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;'>
+                                        <h4 style='color: #ffffff; margin: 0; font-size: 1.1rem; font-weight: 600; line-height: 1.3;'>
+                                            {key}
+                                        </h4>
+                                    </div>
+                                    <div style='display: flex; align-items: center; margin-top: 0.8rem;'>
+                                        <span style='color: #64B5F6; font-size: 0.9rem; font-weight: 500;'>
+                                            📍 {distance} Kms away
+                                        </span>
+                                    </div>
+                                </div>
+                            """, unsafe_allow_html=True)
         else:
-            st.warning("No properties found in the selected area. Try increasing the radius or selecting a different location.")
+            st.markdown("""
+                <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                            padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                            border-left: 4px solid #ff6b6b;
+                            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                    <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                        ⚠️ No properties found in the selected area. Try increasing the radius or selecting a different location.
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
 
 
     # Recommendation section
@@ -151,22 +248,147 @@ def recommendation_model():
                 recommendation_df['Link'] = [link_loc[key].values[0] if key in link_loc and len(link_loc[key].values) > 0 else '#' for key in recommendation_df['PropertyName']]
                 # Check if there are any recommendations
                 if recommendation_df.empty:
-                    st.warning(f'No Recommendations found!')
+                    st.markdown("""
+                        <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                                    padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                                    border-left: 4px solid #ff6b6b;
+                                    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                            <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                                ⚠️ No Recommendations found!
+                            </p>
+                        </div>
+                    """, unsafe_allow_html=True)
                 else:
-                    # Display success message and recommended apartments
-                    st.success("### Recommended Apartments:")
-                    # Iterate through each recommended property and display its details
-                    for index, row in recommendation_df.iterrows():
-                        # Display property name as clickable but styled like regular text
-                        _ = st.markdown("---")
-                        _ = st.markdown(f'<a href="{row["Link"]}" style="text-decoration: none; color: inherit; font-weight: bold; font-size: 18px;">{row["PropertyName"]}</a>', unsafe_allow_html=True)
+                    # Display recommendations in modern card style
+                    for idx, (index, row) in enumerate(recommendation_df.iterrows(), 1):
+                        # Get image URL
+                        prop_name = row["PropertyName"]
+                        img_row = images_df[images_df['PropertyName'] == prop_name]
+                        img_src = None
+                        if not img_row.empty and pd.notna(img_row.iloc[0]['ImageURL']):
+                            img_src = img_row.iloc[0]['ImageURL']
                         
-                        # NEW: Call the lookup function instead of scraper
-                        image_lookup(row)
+                        # Get location/sector for the property
+                        # Find the sector with minimum distance for this property
+                        property_location = "Gurgaon"
+                        if prop_name in location_df.index:
+                            prop_distances = location_df.loc[prop_name]
+                            # Find the sector with minimum distance (closest sector)
+                            min_distance_sector = prop_distances.idxmin()
+                            if pd.notna(prop_distances[min_distance_sector]) and prop_distances[min_distance_sector] < 5000:  # Within 5km
+                                property_location = min_distance_sector.replace('_', ' ').title()
+                        
+                        # Determine listing site from link and set colors
+                        listing_site = "Listing"
+                        link = row["Link"]
+                        button_bg = "linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 100%)"
+                        button_color = "#5fcf7c"
+                        button_border = "#5fcf7c"
+                        button_hover_bg = "linear-gradient(135deg, #2d5a3d 0%, #3d6a4d 100%)"
+                        
+                        if "99acres" in link.lower():
+                            listing_site = "99acres Listing"
+                            # 99acres brand blue colors
+                            button_bg = "linear-gradient(135deg, #0078D7 0%, #0066CC 100%)"
+                            button_color = "#ffffff"
+                            button_border = "#0078D7"
+                            button_hover_bg = "linear-gradient(135deg, #0066CC 0%, #0052A3 100%)"
+                        
+                        # Create card layout with columns
+                        col_img, col_info = st.columns([1, 2], gap="medium")
+                        
+                        with col_img:
+                            # Display image in card
+                            if img_src:
+                                st.markdown(f"""
+                                    <div style='border-radius: 12px; overflow: hidden; 
+                                                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);'>
+                                """, unsafe_allow_html=True)
+                                st.image(img_src, use_container_width=True)
+                                st.markdown("</div>", unsafe_allow_html=True)
+                            else:
+                                fallback_path = 'datasets/No_images.jpg'
+                                if os.path.exists(fallback_path):
+                                    st.markdown(f"""
+                                        <div style='border-radius: 12px; overflow: hidden; 
+                                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);'>
+                                    """, unsafe_allow_html=True)
+                                    st.image(fallback_path, use_container_width=True)
+                                    st.markdown("</div>", unsafe_allow_html=True)
+                        
+                        with col_info:
+                            # Property card with modern styling
+                            similarity_score = row['SimilarityScore']
+                            similarity_percent = round(similarity_score * 100, 1)
+                            
+                            st.markdown(f"""
+                                <div style='background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%); 
+                                            padding: 1.5rem; border-radius: 12px; 
+                                            border-left: 4px solid #5fcf7c;
+                                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+                                            margin-bottom: 1.5rem;
+                                            transition: transform 0.3s ease;'>
+                                    <div style='display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.8rem;'>
+                                        <div>
+                                            <h3 style='color: #ffffff; margin: 0 0 0.5rem 0; font-size: 1.4rem; font-weight: 600;'>
+                                                {idx}. {row["PropertyName"]}
+                                            </h3>
+                                            <p style='color: #64B5F6; margin: 0; font-size: 1rem; font-weight: 500;'>
+                                                📍 {property_location}
+                                            </p>
+                                        </div>
+                                        <span style='background: rgba(95, 207, 124, 0.2); 
+                                                     color: #5fcf7c; 
+                                                     padding: 0.3rem 0.8rem; 
+                                                     border-radius: 20px; 
+                                                     font-size: 0.85rem; 
+                                                     font-weight: 600;'>
+                                            {similarity_percent}% Match
+                                        </span>
+                                    </div>
+                                    <div style='margin-top: 1rem;'>
+                                        <a href="{row["Link"]}" 
+                                           target="_blank"
+                                           class="listing-button-{idx}"
+                                           style='display: inline-block;
+                                                  background: {button_bg};
+                                                  color: {button_color};
+                                                  padding: 0.6rem 1.5rem;
+                                                  border-radius: 8px;
+                                                  text-decoration: none;
+                                                  font-weight: 600;
+                                                  border: 2px solid {button_border};
+                                                  transition: all 0.3s ease;'>
+                                            View {listing_site} →
+                                        </a>
+                                    </div>
+                                </div>
+                            """, unsafe_allow_html=True)
+                        
+                        # Add spacing between cards
+                        st.markdown("<br>", unsafe_allow_html=True)
             else:
-                st.warning("Please select an apartment first.")
-    else:
-        st.warning("No apartments available in the selected area. Please adjust your location and radius settings above.")
+                st.markdown("""
+                    <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                                padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                                border-left: 4px solid #ff6b6b;
+                                box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                        <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                            ⚠️ Please select an apartment first.
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+                <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                            padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                            border-left: 4px solid #ff6b6b;
+                            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                    <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                        ⚠️ No apartments available in the selected area. Please adjust your location and radius settings above.
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
 
     
     # Footer information

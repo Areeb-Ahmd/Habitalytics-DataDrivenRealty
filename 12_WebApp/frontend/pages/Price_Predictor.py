@@ -194,7 +194,16 @@ def show_price_predictor():
     if predict_button:
         # Validate input
         if built_up_area == 0:
-            st.error("⚠️ Please enter a valid Built-up Area")
+            st.markdown("""
+                <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                            padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                            border-left: 4px solid #ff6b6b;
+                            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                    <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                        ⚠️ Please enter a valid Built-up Area
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
         else:
             # Prepare request payload
             payload = {
@@ -223,11 +232,37 @@ def show_price_predictor():
                     low = result["lower_range"]
                     high = result["upper_range"]
             except requests.exceptions.ConnectionError:
-                st.error("⚠️ Cannot connect to prediction service. Please ensure the API server is running.")
-                st.info(f"Trying to connect to: {API_URL}")
+                st.markdown("""
+                    <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                                padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                                border-left: 4px solid #ff6b6b;
+                                box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                        <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                            ⚠️ Cannot connect to prediction service. Please ensure the API server is running.
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
+                st.markdown(f"""
+                    <div style='background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%); 
+                                padding: 1rem; border-radius: 12px; margin: 1rem 0;
+                                border-left: 4px solid #64B5F6;'>
+                        <p style='color: #ffffff; margin: 0; font-size: 0.9rem; line-height: 1.6;'>
+                            ℹ️ Trying to connect to: {API_URL}
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
                 return
             except requests.exceptions.RequestException as e:
-                st.error(f"⚠️ Error connecting to prediction service: {str(e)}")
+                st.markdown(f"""
+                    <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                                padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                                border-left: 4px solid #ff6b6b;
+                                box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                        <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                            ⚠️ Error connecting to prediction service: {str(e)}
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
                 return
 
             # Display Results with styling

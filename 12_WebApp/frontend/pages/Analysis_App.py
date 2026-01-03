@@ -107,12 +107,37 @@ def show_analysis_app():
 
     feature_texts = ' '.join(wordcloud_text)
 
-    wordcloud = WordCloud(width=1200, height=800, background_color='white', stopwords={'s'}, min_font_size=10).generate(feature_texts)
-    plt.figure(figsize=(8, 8), facecolor=None)
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis('off')
-    plt.tight_layout(pad=0)
-    st.pyplot(plt)
+    if feature_texts.strip():  # Check if there's actual text to generate wordcloud
+        try:
+            wordcloud = WordCloud(width=1200, height=800, background_color='white', stopwords={'s'}, min_font_size=10).generate(feature_texts)
+            fig, ax = plt.subplots(figsize=(8, 8), facecolor=None)
+            ax.imshow(wordcloud, interpolation='bilinear')
+            ax.axis('off')
+            plt.tight_layout(pad=0)
+            st.pyplot(fig)
+            plt.close(fig)
+        except Exception as e:
+            st.markdown("""
+                <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                            padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                            border-left: 4px solid #ff6b6b;
+                            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                    <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                        ⚠️ Unable to generate word cloud. No features available for the selected sector.
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
+                        padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
+                        border-left: 4px solid #ff6b6b;
+                        box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);'>
+                <p style='color: #ffcccc; margin: 0; font-size: 1rem; line-height: 1.6;'>
+                    ⚠️ No features available for the selected sector to generate word cloud.
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
 
 
     # Scatter Plot (Built-up Area vs Price)

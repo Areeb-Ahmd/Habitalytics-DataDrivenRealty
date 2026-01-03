@@ -54,6 +54,64 @@ def set_background_color_and_text():
             background-color: #001f3f !important;
             color: #ffffff !important;
         }}
+        
+        /* Remove corner triangles from navigation menu - consolidated */
+        section[data-testid="stSidebar"] [class*="option-menu"]::before,
+        section[data-testid="stSidebar"] [class*="option-menu"]::after,
+        section[data-testid="stSidebar"] [class*="option-menu"] *::before,
+        section[data-testid="stSidebar"] [class*="option-menu"] *::after {{
+            display: none !important;
+            content: none !important;
+            visibility: hidden !important;
+        }}
+        
+        section[data-testid="stSidebar"] [class*="option-menu"] {{
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }}
+        
+        section[data-testid="stSidebar"] [class*="corner"],
+        section[data-testid="stSidebar"] [class*="triangle"],
+        section[data-testid="stSidebar"] [class*="decoration"] {{
+            display: none !important;
+        }}
+        
+        /* Sidebar navigation text color - consolidated */
+        section[data-testid="stSidebar"] [class*="nav-link"],
+        section[data-testid="stSidebar"] [class*="nav-link"] *,
+        section[data-testid="stSidebar"] [class*="option-menu"] a,
+        section[data-testid="stSidebar"] [class*="option-menu"] a * {{
+            color: #ffffff !important;
+        }}
+        
+        /* Navigation menu title - consolidated */
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] [class*="menu-title"],
+        section[data-testid="stSidebar"] [class*="menu-title"] *,
+        section[data-testid="stSidebar"] [class*="option-menu"] h3 {{
+            color: #ffffff !important;
+        }}
+        
+        /* About section text color - consolidated */
+        section[data-testid="stSidebar"] .stAlert,
+        section[data-testid="stSidebar"] [data-testid="stAlert"] {{
+            background-color: #1a1a2e !important;
+            border-left-color: #64B5F6 !important;
+        }}
+        
+        section[data-testid="stSidebar"] .stAlert *,
+        section[data-testid="stSidebar"] .stMarkdown *,
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] h4 {{
+            color: #ffffff !important;
+        }}
+        
+        /* Preserve selected nav link green color */
+        section[data-testid="stSidebar"] [class*="nav-link-selected"],
+        section[data-testid="stSidebar"] [class*="nav-link-selected"] * {{
+            color: #5fcf7c !important;
+        }}
 
         /* Remove space above logo */
         section[data-testid="stSidebar"] .block-container {{
@@ -97,13 +155,28 @@ def set_background_color_and_text():
             color: #ffffff !important;
         }}
         
+        /* Selectbox text color */
+        .stSelectbox [data-baseweb="select"] * {{
+            color: #ffffff !important;
+        }}
+        
         /* Selectbox dropdown menu */
         [data-baseweb="popover"] {{
             background-color: #1a1a2e !important;
+            color: #ffffff !important;
+        }}
+        
+        [data-baseweb="popover"] * {{
+            color: #ffffff !important;
         }}
         
         [data-baseweb="menu"] {{
             background-color: #1a1a2e !important;
+            color: #ffffff !important;
+        }}
+        
+        [data-baseweb="menu"] * {{
+            color: #ffffff !important;
         }}
         
         [data-baseweb="menu"] li {{
@@ -113,6 +186,23 @@ def set_background_color_and_text():
         
         [data-baseweb="menu"] li:hover {{
             background-color: #2a2a4e !important;
+            color: #ffffff !important;
+        }}
+        
+        /* Dropdown menu item text - consolidated */
+        [data-baseweb="menu"] li,
+        [data-baseweb="menu"] li *,
+        [data-baseweb="menu"] [data-baseweb="option"],
+        [data-baseweb="menu"] [data-baseweb="option"] *,
+        [data-baseweb="popover"] [data-baseweb="menu"] * {{
+            color: #ffffff !important;
+        }}
+        
+        [data-baseweb="menu"] li[aria-selected="true"],
+        [data-baseweb="menu"] [data-baseweb="option"][aria-selected="true"],
+        [data-baseweb="menu"] [data-baseweb="option"]:hover {{
+            background-color: #2a2a4e !important;
+            color: #ffffff !important;
         }}
         
         /* Number input styling - Dark background */
@@ -122,9 +212,40 @@ def set_background_color_and_text():
             border: 1px solid #2a2a4e !important;
         }}
         
+        /* Number input background - consolidated */
+        input[type="number"],
+        .stNumberInput input,
+        [data-testid="stNumberInput"] input,
+        [data-baseweb="input"] input,
+        .stNumberInput > div > div,
+        .stNumberInput div {{
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+            border: 1px solid #2a2a4e !important;
+        }}
+        
+        .stNumberInput input[type="number"]::-webkit-inner-spin-button,
+        .stNumberInput input[type="number"]::-webkit-outer-spin-button {{
+            background-color: #1a1a2e !important;
+        }}
+        
         .stNumberInput label {{
             color: #ffffff !important;
         }}
+        
+        /* Number input increment/decrement buttons */
+        .stNumberInput button {{
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+            border: 1px solid #2a2a4e !important;
+        }}
+        
+        .stNumberInput button:hover {{
+            background-color: #2a2a4e !important;
+            color: #5fcf7c !important;
+            border-color: #5fcf7c !important;
+        }}
+        
         
         /* Text input styling - Dark background */
         .stTextInput > div > div > input {{
@@ -145,36 +266,56 @@ def set_background_color_and_text():
             border-color: #5fcf7c !important;
             box-shadow: 0 0 0 1px #5fcf7c !important;
         }}
-
-        /* Override ALL possible number input focus states with green */
-        input[type="number"]:focus {{
-            border-color: #5fcf7c !important;
-            box-shadow: 0 0 0 1px #5fcf7c !important;
-            outline: none !important;
+        
+        /* Selectbox dropdown text */
+        .stSelectbox [data-baseweb="popover"] [data-baseweb="menu"] *,
+        div[data-baseweb="popover"] div[data-baseweb="menu"] * {{
+            color: #ffffff !important;
         }}
 
-        .stNumberInput input:focus {{
-            border-color: #5fcf7c !important;
-            box-shadow: 0 0 0 1px #5fcf7c !important;
-            outline: none !important;
-        }}
-
-        .stNumberInput > div > div > input:focus {{
-            border-color: #5fcf7c !important;
-            box-shadow: 0 0 0 1px #5fcf7c !important;
-            outline: none !important;
-        }}
-
-        [data-testid="stNumberInput"] input:focus {{
-            border-color: #5fcf7c !important;
-            box-shadow: 0 0 0 1px #5fcf7c !important;
-            outline: none !important;
-        }}
-
-        /* Target the wrapper on focus-within */
+        /* Number input focus state */
+        input[type="number"]:focus,
+        .stNumberInput input:focus,
         .stNumberInput:focus-within input {{
             border-color: #5fcf7c !important;
             box-shadow: 0 0 0 1px #5fcf7c !important;
+            outline: none !important;
+        }}
+        
+        /* Popover button styling (Field Guide) */
+        [data-testid="stPopover"] button {{
+            background-color: #1a1a2e !important;
+            color: #64B5F6 !important;
+            border: 1px solid #2a2a4e !important;
+        }}
+        
+        [data-testid="stPopover"] button:hover {{
+            background-color: #2a2a4e !important;
+            color: #5fcf7c !important;
+            border-color: #5fcf7c !important;
+        }}
+        
+        /* Additional popover button selectors for better coverage */
+        button[data-testid="baseButton-secondary"] {{
+            background-color: #1a1a2e !important;
+            color: #64B5F6 !important;
+            border: 1px solid #2a2a4e !important;
+        }}
+        
+        button[data-testid="baseButton-secondary"]:hover {{
+            background-color: #2a2a4e !important;
+            color: #5fcf7c !important;
+            border-color: #5fcf7c !important;
+        }}
+        
+        /* Popover content styling (Field Guide) - consolidated */
+        [data-testid="stPopover"] div:not(.guide-section),
+        [data-baseweb="popover"] div:not(.guide-section) {{
+            background-color: #1a1a2e !important;
+        }}
+        
+        [data-testid="stPopover"] .guide-section {{
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%) !important;
         }}
 
         /* Even more subtle version */
@@ -481,6 +622,56 @@ def display_home():
 with st.sidebar:
     st.image(os.path.join("datasets", "logo4_upscaled.jpg"))
     
+    # JavaScript to remove corner triangles if CSS doesn't work
+    st.markdown("""
+    <script>
+    (function() {
+        function removeTriangles() {
+            // Find all elements in the sidebar with option-menu classes
+            const sidebar = document.querySelector('section[data-testid="stSidebar"]');
+            if (!sidebar) return;
+            
+            // Find option menu container
+            const optionMenus = sidebar.querySelectorAll('[class*="option-menu"]');
+            optionMenus.forEach(menu => {
+                // Remove all ::before and ::after pseudo-elements
+                const style = document.createElement('style');
+                style.textContent = `
+                    [class*="option-menu"]::before,
+                    [class*="option-menu"]::after,
+                    [class*="option-menu"] *::before,
+                    [class*="option-menu"] *::after {
+                        display: none !important;
+                        content: none !important;
+                        visibility: hidden !important;
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                // Remove any absolutely positioned small elements (likely triangles)
+                const allElements = menu.querySelectorAll('*');
+                allElements.forEach(el => {
+                    const style = window.getComputedStyle(el);
+                    if ((style.position === 'absolute' || style.position === 'fixed') &&
+                        (parseInt(style.width) < 20 || parseInt(style.height) < 20)) {
+                        el.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Run immediately and also after a short delay
+        removeTriangles();
+        setTimeout(removeTriangles, 100);
+        setTimeout(removeTriangles, 500);
+        
+        // Also run when DOM changes
+        const observer = new MutationObserver(removeTriangles);
+        observer.observe(document.body, { childList: true, subtree: true });
+    })();
+    </script>
+    """, unsafe_allow_html=True)
+    
     selected = option_menu(
         menu_title="NAVIGATION",
         options=["Home", "Price Predictor", "Analytics", "Recommend Apartments"],
@@ -488,57 +679,87 @@ with st.sidebar:
         default_index=0,
         orientation="vertical",
         styles={
-            "container": {"padding": "0!important", "background-color": "#001f3f"},
+            "container": {"padding": "0!important", "background-color": "#001f3f", "border": "none", "box-shadow": "none", "border-radius": "0", "outline": "none"},
             "icon": {"color": "white", "font-size": "22px"},
             "nav-link": {"color": "white", "font-size": "18px", "text-align": "left", "margin":"0 0 0 0"},
             "nav-link-selected": {"background-color": "#003366", "color": "#5fcf7c"},
+            "menu-title": {"color": "#ffffff", "font-size": "18px", "font-weight": "600"},
         }
     )
     
-    # About Section
-    st.markdown("### About")
-    st.sidebar.info(
-        "This dashboard leverages advanced analytics and machine learning to deliver "
-        "actionable insights and accurate predictions for the Gurgaon real estate market. "
-        "Designed for buyers, investors, and analysts, it empowers data-driven property decisions."
-    )
-
-    # Contact Section
-    st.markdown("### Contact Developer")
-    st.sidebar.markdown(
-        """
-        <div style='line-height: 1.6;'>
-            <strong>Syed Areeb Ahmad</strong><br><br>
-            <div style='display: flex; gap: 15px; align-items: center;'>
-                <a href="mailto:ahmad.syedareeb7@gmail.com" 
-                target="_blank" 
-                style="text-decoration: none;">
-                    <img src="https://cdn-icons-png.flaticon.com/512/5968/5968534.png" 
-                        width="32" height="32" 
-                        style="vertical-align: middle;"
-                        alt="Gmail">
-                </a>
-                <a href="https://www.linkedin.com/in/areeb-ahmad7" 
-                target="_blank" 
-                style="text-decoration: none;">
-                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" 
-                        width="32" height="32" 
-                        style="vertical-align: middle;"
-                        alt="LinkedIn">
-                </a>
-                <a href="https://github.com/Areeb-Ahmd" 
-                target="_blank" 
-                style="text-decoration: none;">
-                    <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" 
-                        width="32" height="32" 
-                        style="vertical-align: middle;"
-                        alt="GitHub">
-                </a>
+    # About Section - Modern Design
+    st.sidebar.markdown("""
+        <div style='margin: 1.5rem 0;'>
+            <h3 style='color: #5fcf7c; font-size: 1.2rem; font-weight: 700; 
+                       margin: 0 0 0.8rem 0; letter-spacing: 1px;
+                       text-transform: uppercase;'>
+                About
+            </h3>
+            <div style='border-left: 3px solid #5fcf7c; padding-left: 1rem; margin-left: 0.3rem;'>
+                <p style='color: #e5e7eb; line-height: 1.8; font-size: 0.95rem; 
+                          margin: 0; text-align: justify;'>
+                    This dashboard leverages advanced analytics and machine learning to deliver 
+                    actionable insights and accurate predictions for the Gurgaon real estate market. 
+                    Designed for buyers, investors, and analysts, it empowers data-driven property decisions.
+                </p>
             </div>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
+
+    # Contact Developer Section - Modern Design
+    st.sidebar.markdown("""
+        <div style='margin: 1.5rem 0;'>
+            <h3 style='color: #5fcf7c; font-size: 1.2rem; font-weight: 700; 
+                       margin: 0 0 0.8rem 0; letter-spacing: 1px;
+                       text-transform: uppercase;'>
+                Contact Developer
+            </h3>
+            <div style='border-left: 3px solid #5fcf7c; padding-left: 1rem; margin-left: 0.3rem;'>
+                <p style='color: #ffffff; font-size: 1.05rem; font-weight: 600; 
+                          margin: 0 0 1rem 0;'>
+                    Syed Areeb Ahmad
+                </p>
+                <div style='display: flex; gap: 18px; align-items: center; margin-top: 1rem;'>
+                    <a href="mailto:ahmad.syedareeb7@gmail.com" 
+                       target="_blank" 
+                       style="text-decoration: none; 
+                              transition: all 0.3s ease;
+                              display: inline-block;"
+                       onmouseover="this.style.transform='translateY(-3px)'; this.style.opacity='0.8'"
+                       onmouseout="this.style.transform='translateY(0)'; this.style.opacity='1'">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968534.png" 
+                             width="38" height="38" 
+                             style="vertical-align: middle;"
+                             alt="Gmail">
+                    </a>
+                    <a href="https://www.linkedin.com/in/areeb-ahmad7" 
+                       target="_blank" 
+                       style="text-decoration: none; 
+                              transition: all 0.3s ease;
+                              display: inline-block;"
+                       onmouseover="this.style.transform='translateY(-3px)'; this.style.opacity='0.8'"
+                       onmouseout="this.style.transform='translateY(0)'; this.style.opacity='1'">
+                        <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" 
+                             width="38" height="38" 
+                             style="vertical-align: middle;"
+                             alt="LinkedIn">
+                    </a>
+                    <a href="https://github.com/Areeb-Ahmd" 
+                       target="_blank" 
+                       style="text-decoration: none; 
+                              transition: all 0.3s ease;
+                              display: inline-block;"
+                       onmouseover="this.style.transform='translateY(-3px)'; this.style.opacity='0.8'"
+                       onmouseout="this.style.transform='translateY(0)'; this.style.opacity='1'">
+                        <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" 
+                             width="38" height="38" 
+                             style="vertical-align: middle;"
+                             alt="GitHub">
+                    </a>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 # Force reload all page modules on every run to ensure live updates
 # This ensures changes in page files are immediately reflected
