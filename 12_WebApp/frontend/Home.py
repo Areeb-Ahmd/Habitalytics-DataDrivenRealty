@@ -194,26 +194,31 @@ def set_background_color_and_text():
             background-color: #000000 !important;
         }}
 
-        /* Main Streamlit app viewport */
-        div[data-testid="stAppViewContainer"] {{
+        /* Root containers (deployment-safe) */
+        .stApp,
+        div[data-testid="stAppViewContainer"],
+        div[data-testid="stAppViewContainer"] > div {{
             background-color: #000000 !important;
         }}
 
-        /* Top header bar */
-        header[data-testid="stHeader"] {{
+        /* Header + toolbar (multiple fallbacks) */
+        header,
+        header[data-testid="stHeader"],
+        div[data-testid="stToolbar"],
+        div[data-testid="stDecoration"] {{
             background-color: #000000 !important;
             box-shadow: none !important;
-            border-bottom: none !important;
+            border: none !important;
         }}
 
-        /* Toolbar area */
-        div[data-testid="stToolbar"] {{
-            background-color: #000000 !important;
+        /* Kill any gradient / overlay layer */
+        div[data-testid="stDecoration"] {{
+            display: none !important;
         }}
 
-        /* Remove spacing pushed by header */
-        header[data-testid="stHeader"] + div {{
-            margin-top: 0 !important;
+        /* Prevent top padding gap */
+        section.main {{
+            padding-top: 0rem !important;
         }}
         </style>
         """,
