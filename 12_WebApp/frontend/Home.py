@@ -362,51 +362,103 @@ def set_background_color_and_text():
             padding-top: 0rem !important;
         }}
 
-        /* ================= MOBILE FIXES ================= */
+        /* ================= MOBILE RESPONSIVENESS ================= */
+        /* Mobile-first approach: Only apply on screens ≤768px */
         @media (max-width: 768px) {{
-
-            /* Reduce side padding */
+            /* Content container: Full width, minimal padding */
+            /* SAFE: Only reduces padding, doesn't change layout structure */
             div.block-container {{
                 padding: 1rem 1rem !important;
                 max-width: 100% !important;
             }}
-
-            /* Hero title scaling */
+            
+            /* Main content area: Ensure full width */
+            /* SAFE: Only ensures content uses available space */
+            section.main {{
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }}
+            
+            /* Hero headings: Scale down font sizes to prevent clipping */
+            /* SAFE: Only adjusts font-size, preserves text structure */
             h1 {{
-                font-size: 2.4rem !important;
-                letter-spacing: 4px !important;
-                line-height: 1.1 !important;
-                text-align: center !important;
+                font-size: 2rem !important;
+                letter-spacing: 2px !important;
+                line-height: 1.2 !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
             }}
-
-            /* Subtitle text */
+            
+            /* Subheadings: Scale appropriately */
+            /* SAFE: Proportional scaling maintains hierarchy */
+            h2 {{
+                font-size: 1.5rem !important;
+                line-height: 1.3 !important;
+            }}
+            
+            h3 {{
+                font-size: 1.2rem !important;
+                line-height: 1.3 !important;
+            }}
+            
+            /* Paragraph text: Readable size */
+            /* SAFE: Ensures text remains readable */
             p {{
-                font-size: 1rem !important;
-                letter-spacing: 3px !important;
-                text-align: center !important;
+                font-size: 0.95rem !important;
+                line-height: 1.5 !important;
             }}
-
-            /* Cards padding */
-            div[style*="padding: 2rem"] {{
-                padding: 1.2rem !important;
+            
+            /* Inline styled headings in markdown: Scale down */
+            /* SAFE: Targets only font-size in inline styles */
+            div[style*="font-size: 3.5rem"] h1,
+            h1[style*="font-size: 3.5rem"] {{
+                font-size: 2rem !important;
+                letter-spacing: 2px !important;
             }}
-
-            /* Remove fixed heights */
-            div[style*="height: 100%"] {{
-                height: auto !important;
+            
+            div[style*="font-size: 1.8rem"] h2,
+            h2[style*="font-size: 1.8rem"] {{
+                font-size: 1.4rem !important;
             }}
-
-            /* Sidebar width */
+            
+            /* Cards and containers: Reduce padding for mobile */
+            /* SAFE: Only adjusts internal spacing */
+            div[style*="padding: 2rem"],
+            div[style*="padding: 1.5rem"] {{
+                padding: 1rem !important;
+            }}
+            
+            /* Sidebar: Let Streamlit handle visibility, only adjust internal spacing */
+            /* SAFE: Doesn't change sidebar width or visibility behavior */
             section[data-testid="stSidebar"] {{
-                width: 85vw !important;
+                padding: 0.5rem !important;
             }}
-
-            /* Sidebar logo */
+            
+            /* Sidebar content: Scale down fonts for readability */
+            /* SAFE: Only affects text size inside sidebar */
+            section[data-testid="stSidebar"] h3,
+            section[data-testid="stSidebar"] h4,
+            section[data-testid="stSidebar"] p {{
+                font-size: 0.9rem !important;
+            }}
+            
+            /* Sidebar logo: Responsive sizing */
+            /* SAFE: Only adjusts image size, doesn't affect layout */
             section[data-testid="stSidebar"] img {{
-                max-width: 90% !important;
+                max-width: 100% !important;
                 height: auto !important;
-                margin: 0 auto !important;
-                display: block !important;
+            }}
+            
+            /* Columns: Stack vertically on mobile */
+            /* SAFE: Uses Streamlit's native column behavior */
+            div[data-testid="column"] {{
+                min-width: 100% !important;
+            }}
+            
+            /* Prevent horizontal overflow */
+            /* SAFE: Ensures content stays within viewport */
+            body, html {{
+                overflow-x: hidden !important;
             }}
         }}
 
