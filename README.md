@@ -71,97 +71,114 @@ The platform is built for **home buyers, real estate investors, property sellers
 ```
 Habitalytics/
 │
-├── 01 Original Dataset/
-│   ├── 99_acres_scrap.py          # Web scraper for 99acres.com
-│   ├── flats.csv                   # Scraped flats data
-│   ├── houses.csv                  # Scraped houses data
-│   └── appartments.csv             # Scraped apartments data
+├── config/                          # Configuration package
+│   ├── __init__.py                  # Package initialization
+│   └── paths.py                     # Centralized path management
 │
-├── 02 Preprocessing and Cleaning/
-│   ├── data-preprocessing-flats.ipynb
-│   ├── data-preprocessing-houses.ipynb
-│   ├── data-preprocessing-level-2.ipynb
-│   ├── merge-flats-and-house.ipynb
-│   └── [cleaned datasets]
+├── data/                            # All data files (centralized)
+│   ├── raw/                         # Raw scraped data
+│   │   ├── flats.csv
+│   │   ├── houses.csv
+│   │   └── appartments.csv
+│   ├── processed/                   # Processed datasets
+│   │   ├── flats_cleaned.csv
+│   │   ├── house_cleaned.csv
+│   │   ├── gurgaon_properties.csv
+│   │   ├── gurgaon_properties_cleaned_v1.csv
+│   │   ├── gurgaon_properties_cleaned_v2.csv
+│   │   ├── gurgaon_properties_outlier_treated.csv
+│   │   ├── gurgaon_properties_missing_value_imputation.csv
+│   │   ├── gurgaon_properties_post_feature_selection.csv
+│   │   └── gurgaon_properties_post_feature_selection_v2.csv
+│   ├── analytics/                   # Analytics datasets
+│   │   ├── data_viz1.csv
+│   │   ├── latlong.csv
+│   │   └── sector_coordinates.csv
+│   └── recommender/                 # Recommender datasets
+│       ├── appartments.csv
+│       └── property_images.csv
 │
-├── 03 Feature Engineering/
-│   ├── feature-engineering.ipynb
-│   └── gurgaon_properties_cleaned_v2.csv
-│
-├── 04 EDA/
-│   ├── eda-univariate-analysis.ipynb
-│   ├── eda-multivariate-analysis.ipynb
-│   └── gurgaon_properties_cleaned_v2.csv
-│
-├── 05 Outlier Detection/
-│   ├── outlier-treatment.ipynb
-│   └── gurgaon_properties_outlier_treated.csv
-│
-├── 06 Missing Value Imputation/
-│   ├── missing-value-imputation.ipynb
-│   └── gurgaon_properties_missing_value_imputation.csv
-│
-├── 07 Feature Selection/
-│   ├── feature-selection.ipynb
-│   ├── feature-selection-and-feature-engineering.ipynb
-│   └── gurgaon_properties_post_feature_selection.csv
-│
-├── 08 Baseline Prediction Model/
-│   ├── baseline model.ipynb
-│   └── gurgaon_properties_post_feature_selection.csv
-│
-├── 09 Model Selection/
-│   ├── model-selection.ipynb      # Model comparison and selection
-│   ├── pipeline.pkl                # Trained ML pipeline
-│   ├── df.pkl                      # Processed dataset
-│   └── gurgaon_properties_post_feature_selection_v2.csv
-│
-├── 10 Analytics Module/
-│   ├── data-visualization.ipynb
-│   ├── data_viz1.csv
-│   ├── feature_text.pkl
-│   ├── wordcloud_df.pkl
-│   └── latlong.csv
-│
-├── 11 Recommender System/
-│   ├── recommender-system.ipynb
-│   ├── cosine_sim1.pkl            # Similarity matrices
+├── models/                          # All model files (centralized)
+│   ├── pipeline.joblib              # Trained ML pipeline
+│   ├── df.pkl                       # Processed dataset
+│   ├── cosine_sim1.pkl              # Similarity matrices
 │   ├── cosine_sim2.pkl
 │   ├── cosine_sim3.pkl
 │   ├── location_distance.pkl
 │   ├── link_loc.pkl
-│   └── appartments.csv
+│   ├── feature_text.pkl
+│   └── wordcloud_df.pkl
 │
-└── 12_WebApp/
-    ├── backend/
-    │   ├── api.py                   # FastAPI backend service
-    │   ├── pipeline.joblib         # ML model pipeline
-    │   ├── requirements.txt         # Backend dependencies
-    │   └── README.md                # Backend documentation
-    │
-    └── frontend/
-        ├── Home.py                  # Main Streamlit application
-        ├── requirements.txt         # Frontend dependencies
-        ├── df.pkl                   # Dataset for dropdown options
-        ├── sector_coordinates.csv   # Sector location data
-        ├── latlong_scraper.py       # Latitude/longitude scraper
-        ├── generate_images.py       # Property image generator
-        ├── datasets/                # All required datasets and models
-        │   ├── cosine_sim1.pkl      # Similarity matrix 1
-        │   ├── cosine_sim2.pkl      # Similarity matrix 2
-        │   ├── cosine_sim3.pkl      # Similarity matrix 3
-        │   ├── data_viz1.csv        # Visualization dataset
-        │   ├── feature_text.pkl    # Feature text data
-        │   ├── link_loc.pkl         # Property links mapping
-        │   ├── location_distance.pkl # Location distance matrix
-        │   ├── wordcloud_df.pkl     # Word cloud data
-        │   ├── property_images.csv  # Property image URLs
-        │   └── [logo images]        # Application logos
-        └── pages/
-            ├── Property_Valuation.py    # Price prediction page
-            ├── Analytics_Dashboard.py   # Analytics dashboard page
-            └── Property_Recommender.py # Recommender system page
+├── notebooks/                       # Jupyter notebooks (organized by stage)
+│   ├── 01_data_collection/
+│   │   └── 99_acres_scrap.py
+│   ├── 02_preprocessing/
+│   │   ├── data-preprocessing-flats.ipynb
+│   │   ├── data-preprocessing-houses.ipynb
+│   │   ├── data-preprocessing-level-2.ipynb
+│   │   └── merge-flats-and-house.ipynb
+│   ├── 03_feature_engineering/
+│   │   └── feature-engineering.ipynb
+│   ├── 04_eda/
+│   │   ├── eda-univariate-analysis.ipynb
+│   │   └── eda-multivariate-analysis.ipynb
+│   ├── 05_outlier_detection/
+│   │   └── outlier-treatment.ipynb
+│   ├── 06_missing_value_imputation/
+│   │   └── missing-value-imputation.ipynb
+│   ├── 07_feature_selection/
+│   │   ├── feature-selection.ipynb
+│   │   └── feature-selection-and-feature-engineering.ipynb
+│   ├── 08_baseline_model/
+│   │   └── baseline-model.ipynb
+│   ├── 09_model_selection/
+│   │   └── model-selection.ipynb
+│   ├── 10_analytics/
+│   │   └── data-visualization.ipynb
+│   ├── 11_recommender/
+│   │   └── recommender-system.ipynb
+│   └── requirements.txt
+│
+├── scripts/                         # Utility scripts
+│   ├── 99_acres_scrap.py
+│   ├── generate_images.py
+│   └── latlong_scraper.py
+│
+├── 12_WebApp/                       # Web application
+│   ├── backend/
+│   │   ├── api.py                   # FastAPI backend service
+│   │   ├── pipeline.joblib          # ML model pipeline (copy)
+│   │   ├── requirements.txt
+│   │   └── README.md
+│   │
+│   └── frontend/
+│       ├── Home.py                  # Main Streamlit application
+│       ├── requirements.txt
+│       ├── df.pkl                   # Dataset for dropdown options
+│       ├── sector_coordinates.csv
+│       ├── latlong_scraper.py
+│       ├── generate_images.py
+│       ├── datasets/                # Required datasets and models
+│       │   ├── cosine_sim1.pkl
+│       │   ├── cosine_sim2.pkl
+│       │   ├── cosine_sim3.pkl
+│       │   ├── data_viz1.csv
+│       │   ├── feature_text.pkl
+│       │   ├── link_loc.pkl
+│       │   ├── location_distance.pkl
+│       │   ├── wordcloud_df.pkl
+│       │   ├── property_images.csv
+│       │   └── [logo images]
+│       └── pages/
+│           ├── Property_Valuation.py
+│           ├── Analytics_Dashboard.py
+│           └── Property_Recommender.py
+│
+├── pyproject.toml                   # Package configuration
+└── README.md                        # This file
 ```
+
+**Note**: All notebooks use the centralized `config` package for path management. Data files are stored in `data/` and model files in `models/` directories, eliminating redundant copies.
 
 ---
 
@@ -180,13 +197,23 @@ git clone https://github.com/yourusername/Habitalytics.git
 cd Habitalytics
 ```
 
-### Step 2: Navigate to Frontend Directory
+### Step 2: Install Configuration Package
+
+Install the project's configuration package in editable mode to enable centralized path management:
+
+```bash
+pip install -e .
+```
+
+This installs the `habitalytics-config` package, allowing all notebooks and scripts to import paths from the `config` module.
+
+### Step 3: Navigate to Frontend Directory
 
 ```bash
 cd "12_WebApp/frontend"
 ```
 
-### Step 3: Create Virtual Environment
+### Step 4: Create Virtual Environment
 
 **Windows:**
 ```bash
@@ -200,13 +227,13 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### Step 4: Install Frontend Dependencies
+### Step 5: Install Frontend Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 5: Setup Backend API (Optional but Recommended)
+### Step 6: Setup Backend API (Optional but Recommended)
 
 For the Property Valuation feature to work, you need to run the backend API:
 
@@ -240,17 +267,48 @@ For the Property Valuation feature to work, you need to run the backend API:
    export API_URL=http://localhost:8000
    ```
 
-### Step 6: Verify Installation
+### Step 7: Verify Installation
 
-Ensure all required files are present in the `12_WebApp/frontend` directory:
-- `Home.py`
-- `df.pkl`
-- `datasets/` folder with all pickle files and CSVs
-- `pages/` folder with all page modules
+Ensure all required files are present:
+- Configuration package installed (`pip install -e .`)
+- `12_WebApp/frontend/Home.py`
+- `12_WebApp/frontend/df.pkl`
+- `12_WebApp/frontend/datasets/` folder with all pickle files and CSVs
+- `12_WebApp/frontend/pages/` folder with all page modules
+- `data/` directory with all data files
+- `models/` directory with all model files
 
 ---
 
 ## 💻 Usage
+
+### Working with Notebooks
+
+All notebooks use the centralized `config` package for path management. To use notebooks:
+
+1. **Install the configuration package** (if not already installed):
+   ```bash
+   pip install -e .
+   ```
+
+2. **Import paths in your notebook**:
+   ```python
+   from config import DATA_RAW, DATA_PROCESSED, DATA_ANALYTICS, DATA_RECOMMENDER, MODELS_DIR, PROJECT_ROOT
+   ```
+
+3. **Use standardized paths**:
+   ```python
+   # Read data
+   df = pd.read_csv(DATA_PROCESSED / 'gurgaon_properties_cleaned_v1.csv')
+   
+   # Save models
+   joblib.dump(model, MODELS_DIR / 'pipeline.joblib')
+   
+   # Save processed data
+   df.to_csv(DATA_PROCESSED / 'output.csv', index=False)
+   ```
+
+This ensures all file operations use consistent paths regardless of where the notebook is located.
 
 ### Running the Web Application
 
@@ -386,7 +444,7 @@ Ensure all required files are present in the `12_WebApp/frontend` directory:
   - Features and amenities (furnishing details, property features)
   - Property metadata (age/possession, floor number, facing direction)
 - Implemented rate limiting and random delays to prevent IP blocking
-- Data stored in CSV format (flats.csv, houses.csv, appartments.csv)
+- Data stored in CSV format in `data/raw/` directory (flats.csv, houses.csv, appartments.csv)
 
 ### 2. Data Preprocessing
 - Handling missing values
@@ -433,8 +491,10 @@ Ensure all required files are present in the `12_WebApp/frontend` directory:
 
 ### 9. Model Deployment
 - Pipeline creation
-- Model serialization (pickle)
+- Model serialization (joblib and pickle)
+- Models stored in centralized `models/` directory
 - Integration with web application
+- **Path Management**: All notebooks use the `config` package for standardized file paths
 
 ---
 
@@ -574,10 +634,20 @@ The project implements and compares multiple regression models to select the bes
   - Automatically set by deployment platforms like Railway
 
 ### File Paths
-Ensure all paths in the code match your directory structure:
-- Model files: `pipeline.pkl`, `df.pkl`
-- Dataset files: `datasets/` directory
-- Logo images: `datasets/logo*.jpg`
+
+The project uses a centralized path management system through the `config` package. All notebooks and scripts import paths from `config`:
+
+```python
+from config import DATA_RAW, DATA_PROCESSED, DATA_ANALYTICS, DATA_RECOMMENDER, MODELS_DIR, PROJECT_ROOT
+```
+
+**Key Directories:**
+- **Data files**: `data/raw/`, `data/processed/`, `data/analytics/`, `data/recommender/`
+- **Model files**: `models/` directory
+- **Notebooks**: `notebooks/` directory (organized by stage)
+- **Web App**: `12_WebApp/frontend/` and `12_WebApp/backend/`
+
+All file paths are standardized and managed centrally, eliminating hardcoded paths throughout the project.
 
 ---
 
