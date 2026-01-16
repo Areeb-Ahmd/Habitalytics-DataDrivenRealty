@@ -3,8 +3,8 @@ import pickle
 import requests
 from bs4 import BeautifulSoup
 import time
-import os
 import sys
+from config import MODELS_DIR, DATA_RECOMMENDER
 
 # Force output to appear immediately
 sys.stdout.reconfigure(encoding='utf-8')
@@ -12,23 +12,19 @@ sys.stdout.reconfigure(encoding='utf-8')
 print("--- SCRIPT STARTED ---")
 
 def generate_image_database():
-    # 1. Debug Directory
-    current_dir = os.getcwd()
-    print(f"Current Working Directory: {current_dir}")
-    
-    # 2. Check for dataset
-    file_path = os.path.join(current_dir, 'datasets', 'link_loc.pkl')
+    # 1. Check for dataset
+    file_path = MODELS_DIR / 'link_loc.pkl'
     print(f"Looking for file at: {file_path}")
     
-    if not os.path.exists(file_path):
+    if not file_path.exists():
         print("\n!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!")
         print(f"Could not find: {file_path}")
-        print("Make sure you are running this command from the PROJECT ROOT folder.")
-        print("Your 'datasets' folder must be visible next to this script.")
+        print("Make sure the config package is installed: pip install -e .")
+        print("The link_loc.pkl file should be in the models/ directory.")
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return
 
-    # 3. Load Data
+    # 2. Load Data
     try:
         print("Loading pickle file... (this might take a second)")
         link_loc = pickle.load(open(file_path, 'rb'))
@@ -107,7 +103,7 @@ def generate_image_database():
         # Save CSV every 10 items (so you don't lose data if you stop it)
         if count % 10 == 0:
             temp_df = pd.DataFrame(image_data)
-            temp_df.to_csv('datasets/property_images.csv', index=False)
+            temp_df.to_csv(DATA_RECOMMENDER / 'property_images.csv', index=False)
             print("   (Progress Saved to CSV)")
 
         # Sleep to be polite
@@ -115,9 +111,9 @@ def generate_image_database():
 
     # Final Save
     final_df = pd.DataFrame(image_data)
-    final_df.to_csv('datasets/property_images.csv', index=False)
+    final_df.to_csv(DATA_RECOMMENDER / 'property_images.csv', index=False)
     print("\n--- DONE! ---")
-    print(f"Saved {len(final_df)} rows to datasets/property_images.csv")
+    print(f"Saved {len(final_df)} rows to {DATA_RECOMMENDER / 'property_images.csv'}")
 
 if __name__ == "__main__":
     generate_image_database()

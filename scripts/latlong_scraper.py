@@ -1,6 +1,7 @@
 from geopy.geocoders import Nominatim
 import pandas as pd
 import time
+from config import DATA_ANALYTICS
 
 # Initialize geolocator
 geolocator = Nominatim(user_agent="gurgaon_sector_locator")
@@ -25,6 +26,7 @@ for sector in range(1, 116):
 
 # Convert to DataFrame and save
 df = pd.DataFrame(data)
-df.to_csv('sector_coordinates.csv', index=False)
+output_path = DATA_ANALYTICS / 'sector_coordinates.csv'
+df.to_csv(output_path, index=False)
 
-print("\n✅ Coordinates saved successfully!")
+print(f"\n✅ Coordinates saved successfully to: {output_path}")

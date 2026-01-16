@@ -3,7 +3,7 @@ from random import randint
 import pandas as pd
 import requests
 import time
-import os
+from config import DATA_RAW
 
 # Select the city
 City = 'Gurgaon'
@@ -31,18 +31,9 @@ headers = {
 # Select the property name for saving the file
 property_type = ['Flats', 'Societies', 'Residential', 'Independent House']
 
-# Create directories and subdirectories for storing different files
-project_dir = os.getcwd()  # Creating subdirectories in the current directory
-subdirectories = ['Data', f'Data/{City}', f'Data/{City}/{property_type[0]}', f'Data/{City}/{property_type[1]}', f'Data/{City}/{property_type[2]}',
-                  f'Data/{City}/{property_type[3]}']
-
-for subdir in subdirectories:
-    dir_path = os.path.join(project_dir, subdir)
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-        print(f"Created directory: {dir_path}")
-    else:
-        print(f"Directory already exists: {dir_path}")
+# Ensure DATA_RAW directory exists
+DATA_RAW.mkdir(parents=True, exist_ok=True)
+print(f"Using data directory: {DATA_RAW}")
 
 # Page number range for extracting data
 # start = int(input('Page to start: '))
@@ -235,9 +226,10 @@ try:
 except AttributeError as e:
     print(e)
     print("""Your IP might have blocked. Delete Runtime and reconnect again with updating start page number.""")
-
-    csv_file_path = f"{os.getcwd()}{property_type[0]}_{City}_data-page-{start}-{pageNumber - 1}.csv"
-    if os.path.isfile(csv_file_path):
+    
+    # Save partial data to raw directory
+    csv_file_path = DATA_RAW / f"{property_type[0]}_{City}_data-page-{start}-{pageNumber - 1}.csv"
+    if csv_file_path.exists():
         # Append DataFrame to the existing file without header
         flats.to_csv(csv_file_path, mode='a', header=False, index=False)
     else:
@@ -247,5 +239,7 @@ except AttributeError as e:
 # Enter file name
 file_name = input('Type the file name: ')
 
-# Save the file
-flats.to_csv(f'{os.getcwd()}/Data/{City}/{property_type[0]}/{file_name}.csv')
+# Save the file to DATA_RAW directory
+output_path = DATA_RAW / f'{file_name}.csv'
+flats.to_csv(output_path, index=False)
+print(f"File saved to: {output_path}")
