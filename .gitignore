@@ -24,12 +24,16 @@ share/python-wheels/
 MANIFEST
 
 # Virtual Environment
+# Virtual Environment
+notebooks/.venv/
+notebooks_venv/          
 .venv/
 venv/
 ENV/
 env/
 .ENV
-.env
+.env                    
+.env.local
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -56,7 +60,6 @@ logs/
 
 # OS
 Thumbs.db
-.DS_Store
 
 # Temporary files
 *.tmp
@@ -88,4 +91,3 @@ coverage.xml
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
