@@ -45,7 +45,6 @@ for subdir in subdirectories:
         print(f"Directory already exists: {dir_path}")
 
 # Page number range for extracting data
-# start = int(input('Page to start: '))
 start = int(input('Enter the page number to start: '))
 end = start + 2  # Only scraping 10 pages at times as ip address is getting blocked
 
