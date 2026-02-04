@@ -86,8 +86,8 @@ The API will be available at `http://localhost:8000`
 
 **Response Fields**:
 - `base_price`: Predicted price in Crores (₹)
-- `lower_range`: Conservative estimate (15% below base)
-- `upper_range`: Optimistic estimate (15% above base)
+- `lower_range`: Conservative estimate (22% below base)
+- `upper_range`: Optimistic estimate (22% above base)
 
 #### Example using curl
 ```bash

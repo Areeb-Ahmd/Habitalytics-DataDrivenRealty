@@ -127,8 +127,8 @@ Habitalytics/
 │   ├── 06_missing_value_imputation/
 │   │   └── missing-value-imputation.ipynb
 │   ├── 07_feature_selection/
-│   │   ├── feature-selection.ipynb
-│   │   └── feature-selection-and-feature-engineering.ipynb
+│   │   ├── feature-selection_1.ipynb
+│   │   └── feature-selection_2.ipynb
 │   ├── 08_baseline_model/
 │   │   └── baseline-model.ipynb
 │   ├── 09_model_selection/
@@ -186,7 +186,7 @@ Habitalytics/
 
 ### Prerequisites
 
-- Python 3.7 or higher
+- Python 3.8 or higher
 - pip (Python package installer)
 - Git (for cloning the repository)
 
@@ -363,8 +363,8 @@ This ensures all file operations use consistent paths regardless of where the no
    - Luxury category
 3. Click **"Predict Price"** to get instant price prediction with:
    - Base price estimate
-   - Lower range (conservative estimate)
-   - Upper range (optimistic estimate)
+   - Lower range (22% below base - conservative estimate)
+   - Upper range (22% above base - optimistic estimate)
 
 #### Analytics Dashboard
 - **Sector-wise Price Map**: Interactive map showing average prices per sqft across sectors
@@ -485,9 +485,9 @@ This ensures all file operations use consistent paths regardless of where the no
 - Baseline model creation
 - Multiple model comparison (11 regression models tested)
 - 10-fold cross-validation for robust evaluation
-- Hyperparameter tuning using GridSearchCV
+- Hyperparameter tuning using RandomizedSearchCV
 - Model selection based on performance metrics (R², MAE)
-- **Final Model**: Random Forest Regressor (optimized with 500 estimators)
+- **Final Model**: Random Forest Regressor (optimized with 200 estimators)
 
 ### 9. Model Deployment
 - Pipeline creation
@@ -522,12 +522,14 @@ The project implements and compares multiple regression models to select the bes
 - **Evaluation**: All 11 models were evaluated using 10-fold cross-validation
 - **Metrics**: Performance assessed using R² Score and Mean Absolute Error (MAE)
 - **Final Selection**: **Random Forest Regressor** was selected as the final model after comprehensive comparison
-- **Hyperparameter Tuning**: GridSearchCV was used to optimize Random Forest parameters:
-  - `n_estimators`: [50, 100, 200, 300]
-  - `max_depth`: [None, 10, 20, 30]
-  - `max_samples`: [0.1, 0.25, 0.5, 1.0]
-  - `max_features`: [None, 'sqrt']
-- **Final Model**: Random Forest with 500 estimators (optimized hyperparameters)
+- **Hyperparameter Tuning**: RandomizedSearchCV was used to optimize Random Forest parameters:
+  - `n_estimators`: [200, 300, 400, 500]
+  - `max_depth`: [15, 20, 25, 30]
+  - `max_samples`: [0.4, 0.5, 0.6, 0.7]
+  - `max_features`: [None, 'sqrt', 0.6, 0.8]
+  - `min_samples_split`: [2, 5, 10, 15]
+  - `min_samples_leaf`: [1, 2, 4, 6]
+- **Final Model**: Random Forest with 200 estimators (optimized hyperparameters: max_depth=25, max_samples=0.6, max_features=0.8)
 
 ### Model Selection Criteria
 - **R² Score** - Coefficient of determination
@@ -535,10 +537,10 @@ The project implements and compares multiple regression models to select the bes
 - **Cross-Validation** - 10-fold CV for robust evaluation
 
 ### Preprocessing Pipeline
-- **StandardScaler** for numerical features (bedrooms, bathrooms, built-up area, etc.)
-- **OrdinalEncoder** for categorical features (property type, sector, balcony, etc.)
-- **OneHotEncoder** for high-cardinality categorical features (sector, agePossession)
-- **TargetEncoder** (category_encoders) for sector encoding
+- **StandardScaler** for numerical features (bedrooms, bathrooms, built-up area, servant room, store room)
+- **OrdinalEncoder** for categorical features (property_type, balcony, furnishing_type, luxury_category, floor_category)
+- **OneHotEncoder** for agePossession feature
+- **TargetEncoder** (category_encoders) for sector encoding (high-cardinality categorical feature)
 - **Log transformation** (log1p) for target variable (price) to handle skewness
 - **PCA** (optional) for dimensionality reduction
 
