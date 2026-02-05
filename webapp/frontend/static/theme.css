@@ -128,40 +128,57 @@ section[data-testid="stSidebar"] [data-testid="stImage"] {
    dropdown colors + borders (per request). */
 
 /* Number input styling - Dark background
-   Narrowed selectors to avoid double-borders / broken stepper layout. */
-[data-testid="stNumberInput"] [data-baseweb="input"] {
+   Streamlit's internal BaseWeb structure varies by version, so we target:
+   - the widget container
+   - BaseWeb input wrappers (input/base-input)
+   - the actual <input> and +/- buttons */
+.stNumberInput label {
+    color: #ffffff !important;
+}
+
+div[data-testid="stNumberInput"] [data-baseweb="input"],
+div[data-testid="stNumberInput"] [data-baseweb="base-input"],
+div[data-testid="stNumberInput"] .stNumberInput [data-baseweb="input"],
+div[data-testid="stNumberInput"] .stNumberInput [data-baseweb="base-input"] {
     background-color: #1a1a2e !important;
     border: 1px solid #2a2a4e !important;
     border-radius: 6px !important;
 }
 
-[data-testid="stNumberInput"] [data-baseweb="input"] input {
-    background-color: transparent !important;
+/* Ensure the actual input is dark (some versions paint bg on <input>) */
+div[data-testid="stNumberInput"] input,
+.stNumberInput input {
+    background-color: #1a1a2e !important;
     color: #ffffff !important;
     border: none !important;
 }
 
-.stNumberInput input[type="number"]::-webkit-inner-spin-button,
-.stNumberInput input[type="number"]::-webkit-outer-spin-button {
-    background-color: #1a1a2e !important;
-}
-
-.stNumberInput label {
-    color: #ffffff !important;
-}
-
 /* Number input increment/decrement buttons */
-[data-testid="stNumberInput"] [data-baseweb="input"] button {
+div[data-testid="stNumberInput"] button,
+.stNumberInput button {
     background-color: #1a1a2e !important;
     color: #ffffff !important;
     border: none !important;
     border-left: 1px solid #2a2a4e !important;
 }
 
-[data-testid="stNumberInput"] [data-baseweb="input"] button:hover {
+div[data-testid="stNumberInput"] button:hover,
+.stNumberInput button:hover {
     background-color: #2a2a4e !important;
     color: #5fcf7c !important;
-    border-color: #5fcf7c !important;
+}
+
+/* If stepper icons are SVG in some versions */
+div[data-testid="stNumberInput"] button svg,
+.stNumberInput button svg {
+    fill: currentColor !important;
+}
+
+/* WebKit-only native spin buttons (fallback) */
+.stNumberInput input[type="number"]::-webkit-inner-spin-button,
+.stNumberInput input[type="number"]::-webkit-outer-spin-button {
+    background-color: #1a1a2e !important;
+    color: #ffffff !important;
 }
 
 
@@ -186,6 +203,14 @@ section[data-testid="stSidebar"] [data-testid="stImage"] {
 input[type="number"]:focus,
 .stNumberInput input:focus,
 .stNumberInput:focus-within input {
+    border-color: #5fcf7c !important;
+    box-shadow: 0 0 0 1px #5fcf7c !important;
+    outline: none !important;
+}
+
+/* Apply focus ring to the BaseWeb wrapper (newer Streamlit versions) */
+div[data-testid="stNumberInput"]:focus-within [data-baseweb="input"],
+div[data-testid="stNumberInput"]:focus-within [data-baseweb="base-input"] {
     border-color: #5fcf7c !important;
     box-shadow: 0 0 0 1px #5fcf7c !important;
     outline: none !important;

@@ -4,7 +4,6 @@ from pydantic import BaseModel
 import joblib
 import pandas as pd
 import numpy as np
-from typing import List
 import os
 
 app = FastAPI(title="Habitalytics Price Prediction API")
@@ -39,7 +38,8 @@ class PropertyInput(BaseModel):
     sector: str
     bedRoom: float
     bathroom: float
-    balcony: int
+    # Treated as categorical in the trained pipeline (e.g., values like "3+")
+    balcony: str
     agePossession: str
     built_up_area: float
     servant_room: float
@@ -68,15 +68,6 @@ async def predict_price(property: PropertyInput):
         raise HTTPException(status_code=503, detail="Model not loaded")
     
     try:
-        # Validate that balcony is within expected range (should be int, not float)
-        if not isinstance(property.balcony, int):
-            try:
-                property.balcony = int(property.balcony)
-            except (ValueError, TypeError):
-                raise HTTPException(
-                    status_code=400, 
-                    detail=f"Invalid balcony value: {property.balcony}. Must be an integer."
-                )
         # Normalize string inputs to lowercase to match training data format
         # (assuming training data used lowercase for categorical values)
         normalized_property_type = property.property_type.lower().strip()

@@ -83,11 +83,6 @@ def property_recommender_model():
                 You can discover properties located near a selected area within a chosen radius, 
                 or find properties that are similar to a selected property based on shared characteristics.
             </p>
-            <p style='font-size: 1.25rem; line-height: 1.6; color: #ffffff; margin-top: 1rem;'>
-                Recommendations are generated using historical property data and feature similarity. 
-                They are intended to support exploration and comparison, and do not represent 
-                live listings or guaranteed availability.
-            </p>
         </div>
     """, unsafe_allow_html=True)
 

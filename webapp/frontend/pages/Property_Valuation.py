@@ -213,7 +213,7 @@ def show_property_valuation():
                 "sector": sector,
                 "bedRoom": bedrooms,
                 "bathroom": bathroom,
-                "balcony": balcony,
+                "balcony": str(balcony),
                 "agePossession": property_age,
                 "built_up_area": built_up_area,
                 "servant_room": servant_room,
