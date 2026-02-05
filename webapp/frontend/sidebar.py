@@ -44,8 +44,8 @@ def _render_navigation() -> str:
     """Render the navigation menu and return selected option."""
     return option_menu(
         menu_title="NAVIGATION",
-        options=["Home", "Property Valuation", "Analytics Dashboard", "Property Recommender"],
-        icons=["house", "clock", "bar-chart", "cpu"],
+        options=["Home", "Analytics Dashboard", "Property Valuation", "Property Recommender"],
+        icons=["house", "bar-chart", "clock", "cpu"],
         default_index=0,
         orientation="vertical",
         styles={

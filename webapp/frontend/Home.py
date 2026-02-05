@@ -269,12 +269,12 @@ reload_page_modules()
 # Main content based on selection
 if selected == "Home":
     display_home()
-elif selected == "Property Valuation":
-    from pages.Property_Valuation import show_property_valuation
-    show_property_valuation()
 elif selected == "Analytics Dashboard":
     from pages.Analytics_Dashboard import show_analytics_dashboard
     show_analytics_dashboard()
+elif selected == "Property Valuation":
+    from pages.Property_Valuation import show_property_valuation
+    show_property_valuation()
 elif selected == "Property Recommender":
     from pages.Property_Recommender import property_recommender_model
     property_recommender_model()
