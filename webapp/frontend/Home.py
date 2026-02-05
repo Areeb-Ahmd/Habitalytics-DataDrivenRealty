@@ -33,7 +33,6 @@ def set_background_color_and_text():
     css_path = os.path.join(os.path.dirname(__file__), "static", "theme.css")
     with open(css_path, "r", encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
 set_background_color_and_text()
 
 
@@ -55,7 +54,7 @@ def display_home():
                     margin: 1rem auto; border-radius: 2px;'></div>
         <p style='font-size: 1.4rem; color: #5fcf7c; font-weight: 700; 
                   margin-top: 0.5rem; line-height: 1; letter-spacing: 6px;'>
-            DATA DRIVEN REALTY
+            Real Estate Analytics Platform
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -65,22 +64,22 @@ def display_home():
         <div style='background: linear-gradient(135deg, #173b5b 0%, #2a5298 100%); 
                     padding: 2rem; border-radius: 10px; margin: 1.5rem 0;
                     border-left: 5px solid #64B5F6;'>
-            <p style='font-size: 1.1rem; line-height: 1.8; color: #ffffff; margin: 0;'>
-                Welcome to <strong>Habitalytics</strong>, a cutting-edge platform that combines 
-                <strong>Data Science</strong>, <strong>Machine Learning</strong>, and 
-                <strong>Real Estate Intelligence</strong> to bring transparency and insight into property decisions.
+            <p style='font-size: 1.25rem; line-height: 1.8; color: #ffffff; margin: 0;'>
+                <strong>Habitalytics</strong> is a machine learning–powered real estate analytics platform focused on the 
+                Gurugram property market, designed to analyze, visualize, and predict real estate trends.
             </p>
-            <p style='font-size: 1.1rem; line-height: 1.8; color: #ffffff; margin-top: 1rem;'>
-                Whether you're an investor, home buyer, or simply exploring market trends, 
-                <strong>Habitalytics</strong> helps you make <strong>smarter, data-backed decisions</strong>.
+            <p style='font-size: 1.25rem; line-height: 1.8; color: #ffffff; margin-top: 1rem;'>
+                By integrating predictive modeling, exploratory data analysis, and intelligent recommendation systems, 
+                the platform delivers accurate property valuations, sector-wise market insights, and personalized 
+                property recommendations to support <strong>data-driven decision-making</strong>.
             </p>
         </div>
     """, unsafe_allow_html=True)
 
     # What We Offer Section
     st.markdown("""
-        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #ffffff;'>
-            What We Offer
+        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #64B5F6;'>
+            Platform Features
         </h2>
     """, unsafe_allow_html=True)
 
@@ -91,13 +90,12 @@ def display_home():
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
                         border: 2px solid #2a2a40;
                         transition: transform 0.3s ease;'>
-                <h3 style='color: #64B5F6; font-size: 1.4rem; margin-bottom: 1rem;'>
-                    🔹Property Valuation
+                <h3 style='color: #5fcf7c; font-size: 1.5rem; margin-bottom: 1rem; text-align: center;'>
+                    Property Valuation
                 </h3>
-                <p style='color: #cccccc; line-height: 1.8; font-size: 1rem;'>
-                    Predict property prices across Gurugram using ML models trained on location, 
-                    area, furnishing, and local amenities.
-                    Get an instant estimate before buying or renting.
+                <p style='color: #ffffff; line-height: 1.8; font-size: 1.1rem;'>
+                    Predict property prices across Gurugram using machine learning models, 
+                    giving you quick, estimates before buying or renting.
                 </p>
             </div>
         """, unsafe_allow_html=True)
@@ -107,12 +105,12 @@ def display_home():
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
                         border: 2px solid #2a2a40;
                         transition: transform 0.3s ease;'>
-                <h3 style='color: #64B5F6; font-size: 1.4rem; margin-bottom: 1rem;'>
-                    🔹 Analytics Dashboard
+                <h3 style='color: #5fcf7c; font-size: 1.5rem; margin-bottom: 1rem; text-align: center;'>
+                    Analytics Dashboard
                 </h3>
-                <p style='color: #cccccc; line-height: 1.8; font-size: 1rem;'>
-                    Explore <strong>Gurgaon's property landscape</strong> with sector-wise 
-                    <strong>interactive visualizations</strong> and <strong>data insights</strong>.
+                <p style='color: #ffffff; line-height: 1.8; font-size: 1.1rem;'>
+                    Explore Gurugram’s real estate market through sector-wise 
+                    interactive visualizations and clear insights into pricing and trends.
                 </p>
             </div>
         """, unsafe_allow_html=True)
@@ -122,13 +120,12 @@ def display_home():
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
                         border: 2px solid #2a2a40;
                         transition: transform 0.3s ease;'>
-                <h3 style='color: #64B5F6; font-size: 1.4rem; margin-bottom: 1rem;'>
-                    🔹 Property Recommender
+                <h3 style='color: #5fcf7c; font-size: 1.5rem; margin-bottom: 1rem; text-align: center;'>
+                    Property Recommender
                 </h3>
-                <p style='color: #cccccc; line-height: 1.8; font-size: 1rem;'>
-                    Get <strong>personalized apartment recommendations</strong> based on 
-                    your preferred <strong>location and radius</strong> using our 
-                    <strong>intelligent recommender system</strong>.
+                <p style='color: #ffffff; line-height: 1.8; font-size: 1.1rem;'>
+                    Get property recommendations based on location and radius, 
+                    along with similar society suggestions tailored to your preferences.
                 </p>
             </div>
         """, unsafe_allow_html=True)
@@ -136,8 +133,8 @@ def display_home():
 
     # Why Habitalytics Section
     st.markdown("""
-        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #ffffff;'>
-            Why Habitalytics?
+        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #64B5F6;'>
+            Why Choose Habitalytics
         </h2>
     """, unsafe_allow_html=True)
 
@@ -148,20 +145,20 @@ def display_home():
             <div style='display: grid; gap: 1rem;'>
                 <div style='display: flex; align-items: start;'>
                     <span style='color: #64B5F6; font-size: 1.5rem; margin-right: 1rem;'>✓</span>
-                    <p style='color: #ffffff; font-size: 1.05rem; margin: 0; line-height: 1.6;'>
-                        Built specifically for Gurugram's real estate landscape
+                    <p style='color: #ffffff; font-size: 1.2rem; margin: 0; line-height: 1.6;'>
+                        Built specifically for the Gurugram real estate market  
                     </p>
                 </div>
                 <div style='display: flex; align-items: start;'>
                     <span style='color: #64B5F6; font-size: 1.5rem; margin-right: 1rem;'>✓</span>
-                    <p style='color: #ffffff; font-size: 1.05rem; margin: 0; line-height: 1.6;'>
-                        Offers transparent, interactive, and accurate insights.
+                    <p style='color: #ffffff; font-size: 1.2rem; margin: 0; line-height: 1.6;'>
+                        Delivers transparent, interactive, and data-backed insights  
                     </p>
                 </div>
                 <div style='display: flex; align-items: start;'>
                     <span style='color: #64B5F6; font-size: 1.5rem; margin-right: 1rem;'>✓</span>
-                    <p style='color: #ffffff; font-size: 1.05rem; margin: 0; line-height: 1.6;'>
-                        Designed for <strong>buyers, sellers, investors, and analysts</strong> alike.
+                    <p style='color: #ffffff; font-size: 1.2rem; margin: 0; line-height: 1.6;'>
+                        Designed for buyers, investors, and analysts alike
                     </p>
                 </div>
             </div>
@@ -170,8 +167,8 @@ def display_home():
 
     # Who Benefits Section
     st.markdown("""
-        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #ffffff;'>
-            Who Benefits from Habitalytics?
+        <h2 style='font-size: 2.2rem; font-weight: 600; margin: 2rem 0 1.5rem 0; color: #64B5F6;'>
+            Who It’s For
         </h2>
     """, unsafe_allow_html=True)
 
@@ -181,19 +178,21 @@ def display_home():
         st.markdown("""
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
                         border-left: 5px solid #64B5F6; margin-bottom: 1.5rem;'>
-                <h3 style='color: #5fcf7c; margin-bottom: 1rem;'>Home Buyers</h3>
-                <p style='color: #cccccc; line-height: 1.8;'>
-                    Make confident purchase decisions with accurate price predictions and comprehensive 
-                    neighborhood insights. Compare properties and understand fair market value.
+                <h3 style='color: #5fcf7c; margin-bottom: 1rem; text-align: center;'>Home Buyers</h3>
+                <p style='color: #ffffff; line-height: 1.8; font-size: 1.1rem;'>
+                    Make confident purchase decisions with accurate price predictions 
+                    and clear neighborhood insights. 
+                    Compare properties and understand fair market value with ease.
                 </p>
             </div>
             
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
                         border-left: 5px solid #64B5F6;'>
-                <h3 style='color: #5fcf7c; margin-bottom: 1rem;'>Real Estate Investors</h3>
-                <p style='color: #cccccc; line-height: 1.8;'>
-                    Identify high-ROI opportunities, track appreciation trends, and analyze market dynamics 
-                    across Gurugram sectors. Data-driven investment decisions at your fingertips.
+                <h3 style='color: #5fcf7c; margin-bottom: 1rem; text-align: center;'>Real Estate Investors</h3>
+                <p style='color: #ffffff; line-height: 1.8; font-size: 1.1rem;'>
+                    Identify high-ROI opportunities, track appreciation trends, 
+                    and analyze sector-wise market dynamics across Gurugram 
+                    for smarter investments.
                 </p>
             </div>
         """, unsafe_allow_html=True)
@@ -202,24 +201,24 @@ def display_home():
         st.markdown("""
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
                         border-left: 5px solid #64B5F6; margin-bottom: 1.5rem;'>
-                <h3 style='color: #5fcf7c; margin-bottom: 1rem;'>Property Sellers</h3>
-                <p style='color: #cccccc; line-height: 1.8;'>
-                    Price your property competitively based on real market data. Understand what features 
-                    add value and position your listing for maximum returns.
+                <h3 style='color: #5fcf7c; margin-bottom: 1rem; text-align: center;'>Property Sellers</h3>
+                <p style='color: #ffffff; line-height: 1.8; font-size: 1.1rem;'>
+                    Price your property competitively using real market data. 
+                    Understand which features add value and position your listing for better returns.
                 </p>
             </div>
             
             <div style='background: #1a1a2e; padding: 2rem; border-radius: 12px; 
                         border-left: 5px solid #64B5F6;'>
-                <h3 style='color: #5fcf7c; margin-bottom: 1rem;'>Market Analysts</h3>
-                <p style='color: #cccccc; line-height: 1.8;'>
-                    Access comprehensive market data, visualizations, and trend analysis. Perfect for 
-                    research, reporting, and strategic planning in Gurugram's real estate sector.
+                <h3 style='color: #5fcf7c; margin-bottom: 1rem; text-align: center;'>Market Analysts</h3>
+                <p style='color: #ffffff; line-height: 1.8; font-size: 1.1rem;'>
+                    Access comprehensive market data, interactive visualizations, 
+                    and trend analysis for research, reporting, 
+                    and strategic planning in Gurugram’s real estate market.
                 </p>
             </div>
         """, unsafe_allow_html=True)
 
-    st.write("")
     st.write("")
 
     # Call to Action
@@ -227,21 +226,20 @@ def display_home():
         <div style='background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); 
                     padding: 1rem; border-radius: 10px; margin: 1rem 0;
                     text-align: center;'>
-            <h3 style='color: white; font-size: 1.5rem; margin: 0 0 1rem 0;'>
+            <h3 style='color: #64B5F6; font-size: 2rem; margin: 0 0 0 0;'>
                 Ready to Make Smarter Property Decisions?
             </h3>
             <p style='color: white; font-size: 1.1rem; margin: 0;'>
-                <strong>Select an application from the sidebar to get started!</strong>
+                <strong>Explore the tools from the sidebar and start 
+                analyzing Gurugram’s real estate market.</strong>
             </p>
         </div>
     """, unsafe_allow_html=True)
 
     st.write("")
 
-
 # Render sidebar and get selected page
 selected = render_sidebar()
-
 
 # Force reload all page modules on every run to ensure live updates
 def reload_page_modules():

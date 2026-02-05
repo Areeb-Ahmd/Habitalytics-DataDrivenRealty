@@ -87,11 +87,11 @@ def _render_about_section():
                 About
             </h3>
             <div style='border-left: 3px solid #5fcf7c; padding-left: 1rem; margin-left: 0.3rem;'>
-                <p style='color: #e5e7eb; line-height: 1.8; font-size: 0.95rem; 
-                          margin: 0; text-align: justify;'>
-                    This dashboard leverages advanced analytics and machine learning to deliver 
-                    actionable insights and accurate predictions for the Gurgaon real estate market. 
-                    Designed for buyers, investors, and analysts, it empowers data-driven property decisions.
+                <p style='color: #e5e7eb; line-height: 1.8; font-size: 1rem; 
+                          margin: 0; text-align: left;'>
+                    A machine learning–powered real estate analytics platform for Gurugram, 
+                    offering accurate valuations, market insights, 
+                    and an intelligent recommender system for properties and similar societies.
                 </p>
             </div>
         </div>
