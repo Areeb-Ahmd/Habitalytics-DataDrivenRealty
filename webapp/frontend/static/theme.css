@@ -1,11 +1,8 @@
-/* Main app background - BLACK */
-.stApp {
-    background-color: #000000 !important;
-}
-
 /* Main content area background - BLACK */
 section.main {
     background-color: #000000 !important;
+    /* Prevent top padding gap */
+    padding-top: 0rem !important;
 }
 
 div.block-container {
@@ -126,68 +123,22 @@ section[data-testid="stSidebar"] [data-testid="stImage"] {
     color: #ffffff !important;
 }
 
-/* Selectbox dropdown menu */
-[data-baseweb="popover"] {
+/* Selectbox dropdown menu
+   NOTE: Intentionally left as Streamlit/BaseWeb default to restore default
+   dropdown colors + borders (per request). */
+
+/* Number input styling - Dark background
+   Narrowed selectors to avoid double-borders / broken stepper layout. */
+[data-testid="stNumberInput"] [data-baseweb="input"] {
     background-color: #1a1a2e !important;
-    color: #ffffff !important;
-}
-
-[data-baseweb="popover"] * {
-    color: #ffffff !important;
-}
-
-[data-baseweb="menu"] {
-    background-color: #1a1a2e !important;
-    color: #ffffff !important;
-}
-
-[data-baseweb="menu"] * {
-    color: #ffffff !important;
-}
-
-[data-baseweb="menu"] li {
-    background-color: #1a1a2e !important;
-    color: #ffffff !important;
-}
-
-[data-baseweb="menu"] li:hover {
-    background-color: #2a2a4e !important;
-    color: #ffffff !important;
-}
-
-/* Dropdown menu item text - consolidated */
-[data-baseweb="menu"] li,
-[data-baseweb="menu"] li *,
-[data-baseweb="menu"] [data-baseweb="option"],
-[data-baseweb="menu"] [data-baseweb="option"] *,
-[data-baseweb="popover"] [data-baseweb="menu"] * {
-    color: #ffffff !important;
-}
-
-[data-baseweb="menu"] li[aria-selected="true"],
-[data-baseweb="menu"] [data-baseweb="option"][aria-selected="true"],
-[data-baseweb="menu"] [data-baseweb="option"]:hover {
-    background-color: #2a2a4e !important;
-    color: #ffffff !important;
-}
-
-/* Number input styling - Dark background */
-.stNumberInput > div > div > input {
-    background-color: #1a1a2e !important;
-    color: #ffffff !important;
     border: 1px solid #2a2a4e !important;
+    border-radius: 6px !important;
 }
 
-/* Number input background - consolidated */
-input[type="number"],
-.stNumberInput input,
-[data-testid="stNumberInput"] input,
-[data-baseweb="input"] input,
-.stNumberInput > div > div,
-.stNumberInput div {
-    background-color: #1a1a2e !important;
+[data-testid="stNumberInput"] [data-baseweb="input"] input {
+    background-color: transparent !important;
     color: #ffffff !important;
-    border: 1px solid #2a2a4e !important;
+    border: none !important;
 }
 
 .stNumberInput input[type="number"]::-webkit-inner-spin-button,
@@ -200,13 +151,14 @@ input[type="number"],
 }
 
 /* Number input increment/decrement buttons */
-.stNumberInput button {
+[data-testid="stNumberInput"] [data-baseweb="input"] button {
     background-color: #1a1a2e !important;
     color: #ffffff !important;
-    border: 1px solid #2a2a4e !important;
+    border: none !important;
+    border-left: 1px solid #2a2a4e !important;
 }
 
-.stNumberInput button:hover {
+[data-testid="stNumberInput"] [data-baseweb="input"] button:hover {
     background-color: #2a2a4e !important;
     color: #5fcf7c !important;
     border-color: #5fcf7c !important;
@@ -227,17 +179,8 @@ input[type="number"],
 /* Only style Streamlit default text, not markdown with inline styles */
 /* Don't override inline styles in markdown - removed h1-h6 and p/div/span rules */
 
-/* Change selectbox focus border to green */
-.stSelectbox [data-baseweb="select"]:focus-within > div {
-    border-color: #5fcf7c !important;
-    box-shadow: 0 0 0 1px #5fcf7c !important;
-}
-
-/* Selectbox dropdown text */
-.stSelectbox [data-baseweb="popover"] [data-baseweb="menu"] *,
-div[data-baseweb="popover"] div[data-baseweb="menu"] * {
-    color: #ffffff !important;
-}
+/* Selectbox focus outline
+   NOTE: Removed green focus outline to restore default border behavior. */
 
 /* Number input focus state */
 input[type="number"]:focus,
@@ -257,8 +200,8 @@ input[type="number"]:focus,
 
 [data-testid="stPopover"] button:hover {
     background-color: #2a2a4e !important;
-    color: #5fcf7c !important;
-    border-color: #5fcf7c !important;
+    color: #64B5F6 !important;
+    border-color: #64B5F6 !important;
 }
 
 /* Additional popover button selectors for better coverage */
@@ -274,21 +217,44 @@ button[data-testid="baseButton-secondary"]:hover {
     border-color: #5fcf7c !important;
 }
 
-/* Popover content styling (Field Guide) - consolidated */
-[data-testid="stPopover"] div:not(.guide-section),
-[data-baseweb="popover"] div:not(.guide-section) {
+/* Field Guide content (moved from inline page styles) */
+/* Style ONLY the Field Guide popover panel (doesn't affect select dropdowns). */
+div[data-baseweb="popover"]:has(.guide-section) {
     background-color: #1a1a2e !important;
+    border: 1px solid #2a2a4e !important;
+    border-radius: 10px !important;
+    padding: 0.75rem !important;
 }
 
-[data-testid="stPopover"] .guide-section {
-    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%) !important;
+.guide-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid #64B5F6;
+}
+
+.guide-title {
+    color: #64B5F6;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+}
+
+.guide-desc {
+    color: #ffffff;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
 }
 
 /* Even more subtle version */
 .stButton > button[kind="primary"] {
-    background-color: #1a3a2a !important;
+    background-color: #2d5a3d !important;
     border: 2px solid #5fcf7c !important;
-    color: #5fcf7c !important;
+    color: #ffffff !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
 }
 
 .stButton > button[kind="primary"]:hover {
@@ -311,8 +277,7 @@ div[data-testid="stAppViewContainer"] > div {
 /* Header + toolbar (multiple fallbacks) */
 header,
 header[data-testid="stHeader"],
-div[data-testid="stToolbar"],
-div[data-testid="stDecoration"] {
+div[data-testid="stToolbar"] {
     background-color: #000000 !important;
     box-shadow: none !important;
     border: none !important;
@@ -320,12 +285,10 @@ div[data-testid="stDecoration"] {
 
 /* Kill any gradient / overlay layer */
 div[data-testid="stDecoration"] {
+    background-color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
     display: none !important;
-}
-
-/* Prevent top padding gap */
-section.main {
-    padding-top: 0rem !important;
 }
 
 /* ================= MOBILE RESPONSIVENESS ================= */

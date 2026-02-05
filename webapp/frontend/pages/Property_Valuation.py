@@ -1,9 +1,33 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 import pickle
 import requests
 import os
+from pathlib import Path
+
+
+@st.cache_data(show_spinner=False)
+def _load_dropdown_df():
+    """
+    Load the dataframe used to populate dropdowns.
+
+    We try a few common locations to make the page less sensitive to the
+    Streamlit working directory.
+    """
+    candidates = [
+        Path("df.pkl"),
+        Path(__file__).with_name("df.pkl"),
+        # If you keep shared assets in `webapp/frontend/`
+        Path(__file__).resolve().parents[1] / "df.pkl",
+    ]
+
+    for p in candidates:
+        if p.exists():
+            with p.open("rb") as f:
+                return pickle.load(f)
+
+    raise FileNotFoundError(
+        "Could not find df.pkl. Tried: " + ", ".join(str(p) for p in candidates)
+    )
 
 
 def show_property_valuation():
@@ -18,7 +42,7 @@ def show_property_valuation():
                     margin: 1rem auto; border-radius: 2px;'></div>
         <p style='font-size: 1.2rem; color: #5fcf7c; font-weight: 600; 
                   margin-top: 0.5rem; line-height: 1; letter-spacing: 4px;'>
-            AI-Powered Property Valuation
+            Property Price Estimation for Gurugram
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -27,11 +51,17 @@ def show_property_valuation():
         <div style='background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
                     padding: 1.5rem; border-radius: 10px; margin: 1rem 0;
                     border-left: 5px solid #64B5F6;'>
-            <p style='font-size: 1rem; line-height: 1.6; color: #ffffff; margin: 0;'>
-                Get accurate property price predictions based on location, amenities, and market trends. 
-                Our <strong>Machine Learning model</strong> analyzes multiple factors to provide you with 
-                a <strong>reliable price range</strong> for your property.
+            <p style='font-size: 1.25rem; line-height: 1.6; color: #ffffff; margin: 0;'>
+                Habitalytics’ Property Price Evaluation provides an estimated property price based 
+                on the details you enter and patterns observed in historical 
+                real estate data from <strong>Gurugram</strong>. 
             </p>
+            <p style='font-size: 1.25rem; line-height: 1.6; color: #ffffff; margin-top: 1rem;'>
+                The result is an estimate intended to support comparison and decision-making, 
+                not a guaranteed sale or purchase price. Actual prices may vary based on negotiation, 
+                property condition, timing, and local market conditions.
+            </p>
+
         </div>
     """, unsafe_allow_html=True)
 
@@ -41,11 +71,14 @@ def show_property_valuation():
     API_URL = os.getenv("API_URL", "http://localhost:8000")
 
     # Load data for dropdowns only (no model loading)
-    with open('df.pkl', 'rb') as file:
-        df = pickle.load(file)
+    try:
+        df = _load_dropdown_df()
+    except FileNotFoundError as e:
+        st.error(str(e))
+        return
 
     # Input Section Header with Info Button
-    col_header, col_spacer, col_info = st.columns([3, 2, 1])
+    col_header, _, col_info = st.columns([3, 2, 1])
 
     with col_header:
         st.markdown("""
@@ -57,101 +90,71 @@ def show_property_valuation():
     with col_info:
         with st.popover("Field Guide",icon="ℹ️" ,use_container_width=True):
             st.markdown("""
-                <style>
-                .guide-section {
-                    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
-                    padding: 0.6rem 0.8rem;
-                    border-radius: 6px;
-                    margin-bottom: 0.5rem;
-                    border-left: 3px solid #64B5F6;
-                }
-                .guide-title {
-                    color: #64B5F6;
-                    font-weight: bold;
-                    font-size: 0.9rem;
-                    margin-bottom: 0.2rem;
-                }
-                .guide-desc {
-                    color: #cccccc;
-                    font-size: 0.8rem;
-                    line-height: 1.4;
-                    margin: 0;
-                }
-                </style>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <h3 style='color: #5fcf7c; font-size: 1.1rem; margin-bottom: 0.4rem; text-align: center;'>
+                <h3 style='color: #5fcf7c; font-size: 1.5rem; margin-bottom: 0.2rem; text-align: center;'>
                     Field Guide
                 </h3>
             """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Property Type</div>
-                    <div class="guide-desc">Flat (apartment) <br> House (independent)</div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Sector</div>
-                    <div class="guide-desc">Location sector in Gurugram</div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Built-up Area</div>
-                    <div class="guide-desc">Total carpet area in square feet</div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Property Age</div>
-                    <div class="guide-desc">Years since construction completion</div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Furnishing Type</div>
-                    <div class="guide-desc">
-                        • Furnished: Fully equipped<br>
-                        • Semi-furnished: Partial<br>
-                        • Unfurnished: No furniture
+
+            guide_sections = [
+                (
+                    "Property Type",
+                    "<strong>Flat (apartment):</strong> Unit in a multi-storey building/society."
+                    "<br><strong>House:</strong> Independent house/villa/builder floor-type property.",
+                ),
+                ("Sector", "The locality/sector in Gurugram where the property is located."),
+                ("Built-up Area", "The property’s built-up area in square feet."),
+                ("Number of Bedrooms (BHK)", "Count of bedrooms (1–10 in your dropdown)."),
+                ("Number of Bathrooms", "Total bathrooms (including attached + common)."),
+                ("Number of Balconies", "Allowed values: 0, 1, 2, 3, 3+"),
+                (
+                    "Property Age",
+                    "<strong>• New Property:</strong> ~0–1 year old / immediate possession.<br>"
+                    "<strong>• Relatively New:</strong> ~1–5 years old.<br>"
+                    "<strong>• Moderately Old:</strong> ~5–10 years old.<br>"
+                    "<strong>• Old Property:</strong> 10+ years old.<br>"
+                    "<strong>• Under Construction:</strong> Not ready; possession date in future.",
+                ),
+                (
+                    "Furnishing Type",
+                    "<strong>• Unfurnished:</strong> Bare unit (no major furniture, basic fittings only).<br>"
+                    "<strong>• Semifurnished:</strong> Some fixed fittings (wardrobes/modular kitchen/ACs etc.).<br>"
+                    "<strong>• Furnished:</strong> Move-in ready with most furniture/appliances.",
+                ),
+                (
+                    "Luxury Category",
+                    "<strong>• Low:</strong> Basic/generic amenities (e.g., lift/park/security).<br>"
+                    "<strong>• Medium:</strong> Typical gated-society amenities "
+                    "<br>(e.g., gym/clubhouse/pool or multiple facilities).<br>"
+                    "<strong>• High:</strong> Premium/luxury amenities set (many high-end facilities).",
+                ),
+                (
+                    "Floor Category",
+                    "<strong>• Low Floor:</strong> Floors 0–2<br>"
+                    "<strong>• Mid Floor:</strong> Floors 3–10<br>"
+                    "<strong>• High Floor:</strong> Floors 11+",
+                ),
+                (
+                    "Servant Room",
+                    "<strong>What it means:</strong> Dedicated servant/helper room present.<br>"
+                    "<strong>How to answer:</strong> Yes (1) if there is a separate servant/helper room, otherwise No (0).",
+                ),
+                (
+                    "Store Room",
+                    "<strong>What it means:</strong> Dedicated storage/store room present.<br>"
+                    "<strong>How to answer:</strong> Yes (1) if there’s a separate store room, otherwise No (0).",
+                ),
+            ]
+
+            for title, desc in guide_sections:
+                st.markdown(
+                    f"""
+                    <div class="guide-section">
+                        <div class="guide-title">{title}</div>
+                        <div class="guide-desc">{desc}</div>
                     </div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Luxury Category</div>
-                    <div class="guide-desc">Property luxury tier based on amenities</div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Floor Category</div>
-                    <div class="guide-desc">Floor positioning (Low/Mid/High)</div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Servant Room</div>
-                    <div class="guide-desc">Servant/helper quarters availability</div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div class="guide-section">
-                    <div class="guide-title">Store Room</div>
-                    <div class="guide-desc">Additional storage space availability</div>
-                </div>
-            """, unsafe_allow_html=True)
+                    """,
+                    unsafe_allow_html=True,
+                )
 
 
     # Create two columns for better layout
@@ -165,8 +168,8 @@ def show_property_valuation():
         """, unsafe_allow_html=True)
         property_type = st.selectbox('Property Type', ['flat', 'house'])
         sector = st.selectbox('Sector', sorted(df['sector'].unique().tolist()))
-        bedrooms = float(st.selectbox('Number of Bedrooms', sorted(df['bedRoom'].unique().tolist())))
-        bathroom = float(st.selectbox('Number of Bathrooms', sorted(df['bathroom'].unique().tolist())))
+        bedrooms = int(st.selectbox('Number of Bedrooms', sorted(df['bedRoom'].unique().tolist())))
+        bathroom = int(st.selectbox('Number of Bathrooms', sorted(df['bathroom'].unique().tolist())))
         balcony = st.selectbox('Number of Balconies', sorted(df['balcony'].unique().tolist()))
         property_age = st.selectbox('Property Age', sorted(df['agePossession'].unique().tolist()))
 
@@ -177,23 +180,22 @@ def show_property_valuation():
             </h4>
         """, unsafe_allow_html=True)
         built_up_area = float(st.number_input('Built-up Area (in sqft)', min_value=0.0, step=50.0))
-        servant_room = float(st.selectbox('Servant Room', [0.0, 1.0]))
-        store_room = float(st.selectbox('Store Room', [0.0, 1.0]))
+        servant_room = int(st.selectbox('Servant Room', [0, 1]))
+        store_room = int(st.selectbox('Store Room', [0, 1]))
         furnishing_type = st.selectbox('Furnishing Type', sorted(df['furnishing_type'].unique().tolist()))
         luxury_category = st.selectbox('Luxury Category', sorted(df['luxury_category'].unique().tolist()))
         floor_category = st.selectbox('Floor Category', sorted(df['floor_category'].unique().tolist()))
 
-    st.write("")
-    st.write("")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Predict Button with custom styling
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    _, col_btn2, _ = st.columns([1, 2, 1])
     with col_btn2:
         predict_button = st.button('Predict Price', use_container_width=True, type="primary")
 
     if predict_button:
         # Validate input
-        if built_up_area == 0:
+        if built_up_area <= 0:
             st.markdown("""
                 <div style='background: linear-gradient(135deg, #3a1a1a 0%, #4a2a2a 100%); 
                             padding: 1.2rem; border-radius: 12px; margin: 1rem 0;
@@ -268,32 +270,6 @@ def show_property_valuation():
             # Display Results with styling
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Single card containing all 3 prices
-            st.markdown("""
-                <style>
-                    /* Style metric values to be white and visible */
-                    [data-testid="stMetricValue"] {
-                        color: #ffffff !important;
-                        font-size: 1.8rem !important;
-                        font-weight: 700 !important;
-                    }
-                    
-                    /* Style metric labels */
-                    [data-testid="stMetricLabel"] {
-                        color: #cccccc !important;
-                        font-size: 0.95rem !important;
-                    }
-                    
-                    /* Style metric delta (Estimated badge) */
-                    [data-testid="stMetricDelta"] {
-                        color: #5fcf7c !important;
-                        background-color: rgba(95, 207, 124, 0.2) !important;
-                        border-radius: 6px !important;
-                        padding: 0.25rem 0.5rem !important;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-            
             # Single card container for all prices - using HTML structure
             low_val = round(low, 2)
             base_val = round(base_price, 2)
@@ -305,7 +281,7 @@ def show_property_valuation():
                             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);'>
                     <div style='display: flex; justify-content: space-around; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;'>
                         <div style='flex: 1; min-width: 150px; text-align: center;'>
-                            <div style='color: #cccccc; font-size: 0.95rem; margin-bottom: 0.5rem;'>
+                            <div style='color: #ffffff; font-size: 0.95rem; margin-bottom: 0.5rem;'>
                                 🔻 Lower Range
                             </div>
                             <div style='color: #ffffff; font-size: 1.8rem; font-weight: 700;'>
@@ -313,7 +289,7 @@ def show_property_valuation():
                             </div>
                         </div>
                         <div style='flex: 1; min-width: 150px; text-align: center;'>
-                            <div style='color: #cccccc; font-size: 0.95rem; margin-bottom: 0.5rem;'>
+                            <div style='color: #ffffff; font-size: 0.95rem; margin-bottom: 0.5rem;'>
                                 🎯 Base Price
                             </div>
                             <div style='color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;'>
@@ -325,7 +301,7 @@ def show_property_valuation():
                             </div>
                         </div>
                         <div style='flex: 1; min-width: 150px; text-align: center;'>
-                            <div style='color: #cccccc; font-size: 0.95rem; margin-bottom: 0.5rem;'>
+                            <div style='color: #ffffff; font-size: 0.95rem; margin-bottom: 0.5rem;'>
                                 🔺 Upper Range
                             </div>
                             <div style='color: #ffffff; font-size: 1.8rem; font-weight: 700;'>
@@ -339,7 +315,7 @@ def show_property_valuation():
             # Modern Property Summary
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("""
-                <h3 style='color: #64B5F6; font-size: 1.5rem; margin: 1.5rem 0 1rem 0;'>
+                <h3 style='color: #64B5F6; font-size: 1.75rem; margin: 1.5rem 0 1rem 0;'>
                     Property Summary
                 </h3>
             """, unsafe_allow_html=True)
@@ -352,10 +328,10 @@ def show_property_valuation():
                     <div style='background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%); 
                                 padding: 1.0rem; border-radius: 12px; 
                                 border-left: 4px solid #64B5F6; height: 100%;'>
-                        <h4 style='color: #64B5F6; margin-bottom: 0.5rem; font-size: 1.2rem;'>
+                        <h4 style='color: #64B5F6; margin-bottom: 0.5rem; font-size: 1.25rem;'>
                             Property Details
                         </h4>
-                        <div style='color: #cccccc; line-height: 2;'>
+                        <div style='color: #ffffff; line-height: 2;'>
                             <div style='display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #3a3a5e;'>
                                 <span>Type:</span>
                                 <strong style='color: #5fcf7c;'>{property_type.title()}</strong>
@@ -385,10 +361,10 @@ def show_property_valuation():
                     <div style='background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%); 
                                 padding: 1.0rem; border-radius: 12px; 
                                 border-left: 4px solid #5fcf7c; height: 100%;'>
-                        <h4 style='color: #5fcf7c; margin-bottom: 0.5rem; font-size: 1.2rem;'>
+                        <h4 style='color: #5fcf7c; margin-bottom: 0.5rem; font-size: 1.25rem;'>
                             Features & Amenities
                         </h4>
-                        <div style='color: #cccccc; line-height: 2;'>
+                        <div style='color: #ffffff; line-height: 2;'>
                             <div style='display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #3a3a5e;'>
                                 <span>Bedrooms:</span>
                                 <strong style='color: #64B5F6;'>{int(bedrooms)} BHK</strong>
@@ -414,42 +390,49 @@ def show_property_valuation():
                 """, unsafe_allow_html=True)
             
             # Additional Rooms Row
+            servant_icon = "✅" if servant_room == 1 else "❌"
+            store_icon = "✅" if store_room == 1 else "❌"
             st.markdown(f"""
                 <div style='background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%); 
                             padding: 1.0rem; border-radius: 12px; margin-top: 0.75rem;
                             border-left: 4px solid #64B5F6;'>
-                    <h4 style='color: #64B5F6; margin-bottom: 0.5rem; font-size: 1.2rem;'>
+                    <h4 style='color: #64B5F6; margin-bottom: 0.5rem; font-size: 1.25rem;'>
                         Additional Spaces
                     </h4>
                     <div style='display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; color: #cccccc;'>
                         <div style='background: rgba(100, 181, 246, 0.1); padding: 1rem; border-radius: 8px; text-align: center;'>
                             <div style='font-size: 1.5rem; margin-bottom: 0.5rem;'>
-                                {'✅' if servant_room == 1.0 else '❌'}
+                                {servant_icon}
                             </div>
-                            <div style='font-size: 0.9rem;'>Servant Room</div>
+                            <div style='font-size: 0.9rem; color: #ffffff;'>Servant Room</div>
                         </div>
                         <div style='background: rgba(95, 207, 124, 0.1); padding: 1rem; border-radius: 8px; text-align: center;'>
                             <div style='font-size: 1.5rem; margin-bottom: 0.5rem;'>
-                                {'✅' if store_room == 1.0 else '❌'}
+                                {store_icon}
                             </div>
-                            <div style='font-size: 0.9rem;'>Store Room</div>
+                            <div style='font-size: 0.9rem; color: #ffffff;'>Store Room</div>
                         </div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
 
-    st.write("")
-    st.write("") 
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Footer information
     st.markdown("""
         <div style='background: #1a1a2e; padding: 1.5rem; border-radius: 12px; 
                     border-left: 5px solid #5fcf7c; margin: 1rem 0;'>
             <h4 style='color: #5fcf7c; margin-bottom: 1rem;'>How Our Model Works</h4>
-            <p style='color: #cccccc; line-height: 1.8; margin: 0;'>
-                Our ML model is trained on thousands of real estate transactions in Gurgaon. 
-                It considers factors like location, property size, amenities, age, and market trends 
-                to provide accurate price predictions with a confidence interval.
+            <p style='color: #ffffff; font-size: 1.25rem; line-height: 1.8; margin: 0;'>
+                The model is trained on historical property transaction data, 
+                where it learns how different property features have related to 
+                observed prices in similar market contexts.
+            </p>
+            <p style='color: #ffffff; font-size: 1.25rem; line-height: 1.8; margin: 0; margin-top: 1rem;'>
+                When you submit your inputs, the system evaluates all features together such as location,
+                size, and amenities to generate a price estimate that reflects patterns present 
+                in the training data. The estimate does not rely on real-time market data and 
+                should be used as a data-driven reference rather than a precise valuation.
             </p>
         </div>
     """, unsafe_allow_html=True)
