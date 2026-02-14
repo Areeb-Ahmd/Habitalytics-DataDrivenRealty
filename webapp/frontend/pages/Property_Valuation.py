@@ -4,19 +4,14 @@ import requests
 import os
 from pathlib import Path
 
-
 @st.cache_data(show_spinner=False)
 def _load_dropdown_df():
     """
     Load the dataframe used to populate dropdowns.
-
-    We try a few common locations to make the page less sensitive to the
-    Streamlit working directory.
     """
     candidates = [
         Path("df.pkl"),
         Path(__file__).with_name("df.pkl"),
-        # If you keep shared assets in `webapp/frontend/`
         Path(__file__).resolve().parents[1] / "df.pkl",
     ]
 
@@ -65,9 +60,7 @@ def show_property_valuation():
         </div>
     """, unsafe_allow_html=True)
 
-    # API endpoint - use environment variable or default
     # For local: http://localhost:8000
-    # For production: set API_URL environment variable
     API_URL = os.getenv("API_URL", "http://localhost:8000")
 
     # Load data for dropdowns only (no model loading)

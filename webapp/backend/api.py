@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import uvicorn
 import joblib
 import pandas as pd
 import numpy as np
@@ -8,10 +9,10 @@ import os
 
 app = FastAPI(title="Habitalytics Price Prediction API")
 
-# Enable CORS for Streamlit frontend
+# Enable CORS for all origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your Streamlit URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,13 +33,12 @@ async def load_model():
         print(f"Error loading model: {e}")
         raise
 
-# Request model
+# Property Input Model
 class PropertyInput(BaseModel):
     property_type: str
     sector: str
     bedRoom: float
     bathroom: float
-    # Treated as categorical in the trained pipeline (e.g., values like "3+")
     balcony: str
     agePossession: str
     built_up_area: float
@@ -48,7 +48,7 @@ class PropertyInput(BaseModel):
     luxury_category: str
     floor_category: str
 
-# Response model
+# Price Prediction Model
 class PricePrediction(BaseModel):
     base_price: float
     lower_range: float
@@ -60,7 +60,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "model_loaded": pipeline is not None}
+    return {"status": "Healthy", "Prediction Model loaded successfully": pipeline is not None}
 
 @app.post("/predict", response_model=PricePrediction)
 async def predict_price(property: PropertyInput):
@@ -68,8 +68,7 @@ async def predict_price(property: PropertyInput):
         raise HTTPException(status_code=503, detail="Model not loaded")
     
     try:
-        # Normalize string inputs to lowercase to match training data format
-        # (assuming training data used lowercase for categorical values)
+        # Normalize the input data
         normalized_property_type = property.property_type.lower().strip()
         normalized_sector = property.sector.lower().strip()
         normalized_age = property.agePossession.strip()
@@ -100,11 +99,9 @@ async def predict_price(property: PropertyInput):
         ]
         
         # Create DataFrame with explicit dtype to match training data structure
-        # All columns start as object type, then we'll convert numeric ones
         df = pd.DataFrame(input_data, columns=columns, dtype=object)
         
         # Ensure correct data types
-        # Categorical columns (including balcony which is encoded as categorical) must be object/string type
         categorical_cols = ['property_type', 'sector', 'balcony', 'agePossession', 
                            'furnishing_type', 'luxury_category', 'floor_category']
         for col in categorical_cols:
@@ -176,7 +173,6 @@ async def predict_price(property: PropertyInput):
         import traceback
         error_details = traceback.format_exc()
         print(f"Error details: {error_details}")
-        # Return a more user-friendly error message
         error_msg = str(e)
         if "could not convert string to float" in error_msg.lower():
             error_msg = "Invalid data type in input. Please check all fields are correctly formatted."
@@ -188,7 +184,5 @@ async def predict_price(property: PropertyInput):
         )
 
 if __name__ == "__main__":
-    import uvicorn
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
-

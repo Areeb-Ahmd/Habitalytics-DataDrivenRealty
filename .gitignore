@@ -24,7 +24,6 @@ share/python-wheels/
 MANIFEST
 
 # Virtual Environment
-# Virtual Environment
 notebooks/.venv/
 notebooks_venv/          
 .venv/
@@ -50,10 +49,6 @@ env/
 # Streamlit
 .streamlit/
 
-# Data files (optional - uncomment if you don't want to track large CSV files)
-# *.csv
-# *.pkl
-
 # Logs
 *.log
 logs/
@@ -67,8 +62,7 @@ Thumbs.db
 temp/
 tmp/
 
-# Model files (large files excluded)
-# Exclude large pipeline.pkl files (>100MB)
+# Model files
 **/pipeline.pkl
 *.h5
 *.model
