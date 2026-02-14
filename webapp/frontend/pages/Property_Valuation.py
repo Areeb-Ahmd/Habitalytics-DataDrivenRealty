@@ -82,12 +82,6 @@ def show_property_valuation():
 
     with col_info:
         with st.popover("Field Guide",icon="ℹ️" ,use_container_width=True):
-            st.markdown("""
-                <h3 style='color: #5fcf7c; font-size: 1.5rem; margin-bottom: 0.2rem; text-align: center;'>
-                    Field Guide
-                </h3>
-            """, unsafe_allow_html=True)
-
             guide_sections = [
                 (
                     "Property Type",
@@ -137,18 +131,16 @@ def show_property_valuation():
                     "<strong>How to answer:</strong> Yes (1) if there’s a separate store room, otherwise No (0).",
                 ),
             ]
-
-            for title, desc in guide_sections:
-                st.markdown(
-                    f"""
-                    <div class="guide-section">
-                        <div class="guide-title">{title}</div>
-                        <div class="guide-desc">{desc}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-
+            sections_html = "".join(
+                f'<div class="guide-section"><div class="guide-title">{title}</div><div class="guide-desc">{desc}</div></div>'
+                for title, desc in guide_sections
+            )
+            st.markdown(
+                f'<div class="field-guide-inner" style="background-color: #1a1a2e; border-radius: 10px; padding: 0.75rem; color: #ffffff;">'
+                f'<h3 class="guide-heading" style="color: #5fcf7c; font-size: 1.5rem; margin-bottom: 0.5rem; text-align: center;">Field Guide</h3>'
+                f"{sections_html}</div>",
+                unsafe_allow_html=True,
+            )
 
     # Create two columns for better layout
     col1, col2 = st.columns(2, gap="large")

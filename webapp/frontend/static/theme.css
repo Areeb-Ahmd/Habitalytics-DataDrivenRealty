@@ -244,33 +244,136 @@ button[data-testid="baseButton-secondary"]:hover {
 
 /* Field Guide content (moved from inline page styles) */
 /* Style ONLY the Field Guide popover panel (doesn't affect select dropdowns). */
-div[data-baseweb="popover"]:has(.guide-section) {
+/* Target popover and all inner wrappers so Streamlit/Base Web theme cannot force white. */
+/* Body prefix helps when popover is portaled to document body. */
+body div[data-baseweb="popover"]:has(.guide-section),
+div[data-baseweb="popover"]:has(.guide-section),
+div[data-baseweb="popover"]:has(.guide-section) > div,
+div[data-baseweb="popover"]:has(.guide-section) [data-testid="stMarkdown"],
+div[data-baseweb="popover"]:has(.guide-section) .block-container,
+div[data-baseweb="popover"]:has(.guide-section) .element-container,
+div[data-baseweb="popover"]:has(.guide-section) .stMarkdown,
+div[data-baseweb="popover"]:has(.guide-section) [class*="popover"],
+div[data-baseweb="popover"]:has(.guide-section) [class*="Popover"] {
     background-color: #1a1a2e !important;
-    border: 1px solid #2a2a4e !important;
+    background: #1a1a2e !important;
     border-radius: 10px !important;
+}
+/* Fallback: any container that wraps the Field Guide content (catches Streamlit layout divs) */
+body div:has(> .guide-section),
+body div:has(> .guide-heading):has(.guide-section) {
+    background-color: #1a1a2e !important;
+    background: #1a1a2e !important;
+}
+body div[data-baseweb="popover"]:has(.guide-section),
+div[data-baseweb="popover"]:has(.guide-section) {
+    border: 1px solid #2a2a4e !important;
     padding: 0.75rem !important;
 }
+div[data-baseweb="popover"]:has(.guide-section) p,
+div[data-baseweb="popover"]:has(.guide-section) .stMarkdown p,
+body div:has(.guide-section) p,
+body div:has(.guide-heading):has(.guide-section) p {
+    color: #ffffff !important;
+}
+div[data-baseweb="popover"]:has(.guide-section) h3.guide-heading,
+body div:has(.guide-section) h3.guide-heading {
+    color: #5fcf7c !important;
+}
 
-.guide-section {
-    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+/* Wrapper used when Field Guide is one block (inline style backup) */
+.field-guide-inner {
+    background-color: #1a1a2e !important;
+    background: #1a1a2e !important;
+    color: #ffffff !important;
+}
+.field-guide-inner .guide-title {
+    color: #64B5F6 !important;
+}
+.field-guide-inner .guide-desc {
+    color: #ffffff !important;
+}
+
+div[data-baseweb="popover"]:has(.guide-section) .guide-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%) !important;
     padding: 0.6rem 0.8rem;
     border-radius: 6px;
     margin-bottom: 0.5rem;
     border-left: 3px solid #64B5F6;
 }
 
+.guide-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%) !important;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid #64B5F6;
+}
+
+div[data-baseweb="popover"]:has(.guide-section) .guide-title,
 .guide-title {
-    color: #64B5F6;
+    color: #64B5F6 !important;
     font-weight: bold;
     font-size: 1rem;
     margin-bottom: 0.2rem;
 }
 
+div[data-baseweb="popover"]:has(.guide-section) .guide-desc,
 .guide-desc {
-    color: #ffffff;
+    color: #ffffff !important;
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0;
+}
+
+/* Field Guide heading (shared) - dark mode is default above */
+.guide-heading {
+    color: #5fcf7c;
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+    text-align: center;
+}
+
+/* ===== FIELD GUIDE – SAME DARK LOOK IN LIGHT MODE ===== */
+/* Force dark appearance when browser is in light mode so it always matches dark mode. */
+@media (prefers-color-scheme: light) {
+    [data-testid="stPopover"] button,
+    button[data-testid="baseButton-secondary"] {
+        background-color: #1a1a2e !important;
+        color: #64B5F6 !important;
+        border: 1px solid #2a2a4e !important;
+    }
+    [data-testid="stPopover"] button:hover,
+    button[data-testid="baseButton-secondary"]:hover {
+        background-color: #2a2a4e !important;
+        color: #64B5F6 !important;
+        border-color: #64B5F6 !important;
+    }
+    div[data-baseweb="popover"]:has(.guide-section),
+    div[data-baseweb="popover"]:has(.guide-section) > div,
+    div[data-baseweb="popover"]:has(.guide-section) [data-testid="stMarkdown"],
+    div[data-baseweb="popover"]:has(.guide-section) .block-container,
+    div[data-baseweb="popover"]:has(.guide-section) .element-container,
+    div[data-baseweb="popover"]:has(.guide-section) .stMarkdown {
+        background-color: #1a1a2e !important;
+        background: #1a1a2e !important;
+    }
+    div[data-baseweb="popover"]:has(.guide-section) {
+        border: 1px solid #2a2a4e !important;
+    }
+    div[data-baseweb="popover"]:has(.guide-section) .guide-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+        border-left-color: #64B5F6;
+    }
+    div[data-baseweb="popover"]:has(.guide-section) .guide-title {
+        color: #64B5F6;
+    }
+    div[data-baseweb="popover"]:has(.guide-section) .guide-desc {
+        color: #ffffff;
+    }
+    div[data-baseweb="popover"]:has(.guide-section) .guide-heading {
+        color: #5fcf7c;
+    }
 }
 
 /* Even more subtle version */
