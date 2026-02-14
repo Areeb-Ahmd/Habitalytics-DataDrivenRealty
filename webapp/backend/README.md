@@ -9,8 +9,8 @@ The backend provides a RESTful API for the Habitalytics frontend application. It
 ## Setup
 
 ### Prerequisites
-- Python 3.7 or higher
-- pip package manager
+- Python 3.8 or higher (Dockerfile uses Python 3.12-slim)
+- pip
 
 ### Installation
 
@@ -51,20 +51,23 @@ The API will be available at `http://localhost:8000`
 
 ### `GET /health`
 - **Description**: Health check endpoint
-- **Response**: JSON with status "healthy" if model is loaded
+- **Response**: JSON with `"status": "Healthy"` and `"Prediction Model loaded successfully": true/false`
 
 ### `POST /predict`
 - **Description**: Predict property price based on input features
 - **Content-Type**: `application/json`
 
 #### Request Body
+
+`PropertyInput` in `api.py`: all fields required. `balcony` is a string (e.g. `"2"`).
+
 ```json
 {
   "property_type": "flat",
   "sector": "Sector 1",
   "bedRoom": 2.0,
   "bathroom": 2.0,
-  "balcony": 2,
+  "balcony": "2",
   "agePossession": "New Property",
   "built_up_area": 1200.0,
   "servant_room": 0.0,
@@ -86,8 +89,8 @@ The API will be available at `http://localhost:8000`
 
 **Response Fields**:
 - `base_price`: Predicted price in Crores (₹)
-- `lower_range`: Conservative estimate (22% below base)
-- `upper_range`: Optimistic estimate (22% above base)
+- `lower_range`: base_price − 0.22 (Crores)
+- `upper_range`: base_price + 0.22 (Crores)
 
 #### Example using curl
 ```bash
@@ -98,7 +101,7 @@ curl -X POST "http://localhost:8000/predict" \
     "sector": "Sector 1",
     "bedRoom": 2.0,
     "bathroom": 2.0,
-    "balcony": 2,
+    "balcony": "2",
     "agePossession": "New Property",
     "built_up_area": 1200.0,
     "servant_room": 0.0,
@@ -111,15 +114,11 @@ curl -X POST "http://localhost:8000/predict" \
 
 ## CORS Configuration
 
-The API has CORS enabled to allow requests from the Streamlit frontend:
-- **Allowed Origins**: `*` (all origins) - **Change this in production!**
-- **Allowed Methods**: All methods
-- **Allowed Headers**: All headers
-
-**⚠️ Security Note**: For production deployment, restrict CORS to your frontend URL:
-```python
-allow_origins=["https://your-frontend.railway.app"]
-```
+Configured in `api.py`:
+- **allow_origins**: `["*"]`
+- **allow_credentials**: `True`
+- **allow_methods**: `["*"]`
+- **allow_headers**: `["*"]`
 
 ## Dependencies
 
@@ -131,33 +130,39 @@ Key packages (see `requirements.txt` for full list):
 - `joblib==1.4.2` - Model serialization
 - `pandas==2.3.3` - Data manipulation
 - `numpy==2.3.4` - Numerical computing
+- `category-encoders==2.9.0` - Used by the trained pipeline
 
-## Deployment on Railway
+## Running with Docker
 
-1. **Create a new Web Service** on Railway
-2. **Configuration**:
-   - **Root Directory**: `12_WebApp/backend`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
-3. **Environment Variables**:
-   - `PORT` - Server port (automatically set by Railway, don't set manually)
+The backend has a `Dockerfile` in this directory. Multi-stage build (Python 3.12-slim); the container runs uvicorn and uses the `PORT` environment variable (default 8000).
 
-### Deployment Checklist
-- [ ] Ensure `pipeline.joblib` is in the backend directory
-- [ ] Verify all dependencies are in `requirements.txt`
-- [ ] Update CORS settings for production (restrict origins)
-- [ ] Test API endpoints after deployment
-- [ ] Update frontend `API_URL` environment variable with Railway URL
+From the repository root:
+
+```bash
+cd webapp/backend
+docker build -t habitalytics-backend .
+docker run -p 8000:8000 -e PORT=8000 habitalytics-backend
+```
+
+Ensure `pipeline.joblib` is in `webapp/backend/` before building. Build context should include `api.py`, `requirements.txt`, and `pipeline.joblib`.
+
+## Deployment
+
+The repository does not include `cloudbuild.yaml` or gcloud scripts. The Dockerfile is written to use `PORT` (default 8000), which platforms like Google Cloud Run set automatically. Deploy by building the image (e.g. with Cloud Build or Artifact Registry) and creating a service. Restrict CORS `allow_origins` in `api.py` to your frontend URL in production. Set the frontend's `API_URL` to the deployed backend URL.
 
 ## Environment Variables
 
-- `PORT` - Server port (default: 8000, automatically set by Railway)
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `PORT`   | No       | 8000    | Server port. Read in `api.py`; used by the Dockerfile and PaaS (e.g. Cloud Run). |
+
+No other environment variables are used in the code.
 
 ## Model Information
 
 - **Model Type**: Random Forest Regressor
 - **Pipeline**: Includes preprocessing (scaling, encoding) and model
-- **Input Features**: 11 property attributes
+- **Input Features**: 12 property attributes (see `PropertyInput` in `api.py`)
 - **Output**: Price prediction in Crores (₹)
 - **File Format**: Joblib (.joblib)
 
@@ -170,7 +175,7 @@ Key packages (see `requirements.txt` for full list):
 
 ### Import errors
 - Verify all dependencies: `pip install -r requirements.txt`
-- Check Python version (3.7+ required)
+- Check Python version (3.8+ required)
 
 ### CORS errors from frontend
 - Verify CORS middleware is configured
@@ -190,12 +195,6 @@ FastAPI automatically generates interactive API documentation:
 3. **Error Handling**: Errors are caught and returned as HTTP responses
 4. **Rate Limiting**: Consider adding rate limiting for production use
 
-## 📞 Integration with Frontend
+## Integration with Frontend
 
-The frontend connects to this API using the `API_URL` environment variable:
-```python
-API_URL = os.getenv("API_URL", "http://localhost:8000")
-```
-
-Ensure the frontend's `API_URL` matches the backend's deployed URL.
-
+The Streamlit frontend (`webapp/frontend`) calls this API using the `API_URL` environment variable (set in `pages/Property_Valuation.py`). Ensure the frontend's `API_URL` matches the backend's base URL (e.g. `http://localhost:8000` locally or the deployed service URL).

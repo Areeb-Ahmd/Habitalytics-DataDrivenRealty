@@ -26,6 +26,8 @@
 - [Data Pipeline](#-data-pipeline)
 - [Machine Learning Models](#-machine-learning-models)
 - [Web Application](#-web-application)
+- [Configuration](#-configuration)
+- [Deployment](#-deployment)
 - [Contributing](#-contributing)
 - [Contact](#-contact)
 
@@ -144,20 +146,22 @@ Habitalytics/
 │   ├── generate_images.py
 │   └── latlong_scraper.py
 │
-├── 12_WebApp/                       # Web application
+├── webapp/                          # Web application
 │   ├── backend/
 │   │   ├── api.py                   # FastAPI backend service
+│   │   ├── Dockerfile               # Container image (Python 3.12, PORT default 8000)
 │   │   ├── pipeline.joblib          # ML model pipeline (copy)
 │   │   ├── requirements.txt
 │   │   └── README.md
 │   │
 │   └── frontend/
 │       ├── Home.py                  # Main Streamlit application
+│       ├── sidebar.py               # Sidebar navigation
+│       ├── Dockerfile               # Container image (Python 3.12, PORT default 8080)
 │       ├── requirements.txt
 │       ├── df.pkl                   # Dataset for dropdown options
 │       ├── sector_coordinates.csv
-│       ├── latlong_scraper.py
-│       ├── generate_images.py
+│       ├── static/                  # theme.css, sidebar.js
 │       ├── datasets/                # Required datasets and models
 │       │   ├── cosine_sim1.pkl
 │       │   ├── cosine_sim2.pkl
@@ -210,7 +214,7 @@ This installs the `habitalytics-config` package, allowing all notebooks and scri
 ### Step 3: Navigate to Frontend Directory
 
 ```bash
-cd "12_WebApp/frontend"
+cd webapp/frontend
 ```
 
 ### Step 4: Create Virtual Environment
@@ -237,9 +241,9 @@ pip install -r requirements.txt
 
 For the Property Valuation feature to work, you need to run the backend API:
 
-1. Navigate to backend directory:
+1. Navigate to backend directory (from repo root: `webapp/backend`):
    ```bash
-   cd ../backend
+   cd webapp/backend
    ```
 
 2. Install backend dependencies:
@@ -271,12 +275,36 @@ For the Property Valuation feature to work, you need to run the backend API:
 
 Ensure all required files are present:
 - Configuration package installed (`pip install -e .`)
-- `12_WebApp/frontend/Home.py`
-- `12_WebApp/frontend/df.pkl`
-- `12_WebApp/frontend/datasets/` folder with all pickle files and CSVs
-- `12_WebApp/frontend/pages/` folder with all page modules
+- `webapp/frontend/Home.py`
+- `webapp/frontend/df.pkl`
+- `webapp/frontend/datasets/` folder with all pickle files and CSVs
+- `webapp/frontend/pages/` folder with all page modules
 - `data/` directory with all data files
 - `models/` directory with all model files
+
+### Running with Docker (containerized)
+
+Backend and frontend each have a `Dockerfile` in `webapp/backend/` and `webapp/frontend/`. There is no `docker-compose` in the project; run the two containers separately.
+
+**Backend** (ensure `pipeline.joblib` is in `webapp/backend/` before building):
+
+```bash
+cd webapp/backend
+docker build -t habitalytics-backend .
+docker run -p 8000:8000 -e PORT=8000 habitalytics-backend
+```
+
+**Frontend** (in another terminal; set `API_URL` to the backend URL the browser or frontend container can reach):
+
+```bash
+cd webapp/frontend
+docker build -t habitalytics-frontend .
+docker run -p 8080:8080 -e PORT=8080 -e API_URL=http://localhost:8000 habitalytics-frontend
+```
+
+Frontend app: `http://localhost:8080`. Backend API: `http://localhost:8000`. If the frontend runs in Docker and the backend on the host, use the host’s address (e.g. `http://host.docker.internal:8000` on Docker Desktop) for `API_URL`.
+
+The Dockerfiles use `PORT` (backend default 8000, frontend default 8080) and are suitable for platforms like Google Cloud Run; the repository does not include `cloudbuild.yaml` or gcloud deployment scripts.
 
 ---
 
@@ -323,12 +351,12 @@ This ensures all file operations use consistent paths regardless of where the no
 
 2. **Navigate to the frontend directory**:
    ```bash
-   cd "12_WebApp/frontend"
+   cd webapp/frontend
    ```
    
 3. **Start the backend API** (in a separate terminal, if using Property Valuation):
    ```bash
-   cd "12_WebApp/backend"
+   cd webapp/backend
    python api.py
    ```
 
@@ -632,8 +660,7 @@ The project implements and compares multiple regression models to select the bes
   - Example: `export API_URL=https://your-backend.onrender.com`
 
 #### Backend
-- `PORT` (optional): Server port (default: 8000)
-  - Automatically set by deployment platforms like Railway
+- `PORT` (optional): Server port (default: 8000). Read in `webapp/backend/api.py`; used by the backend Dockerfile and deployment platforms (e.g. Cloud Run)
 
 ### File Paths
 
@@ -647,9 +674,21 @@ from config import DATA_RAW, DATA_PROCESSED, DATA_ANALYTICS, DATA_RECOMMENDER, M
 - **Data files**: `data/raw/`, `data/processed/`, `data/analytics/`, `data/recommender/`
 - **Model files**: `models/` directory
 - **Notebooks**: `notebooks/` directory (organized by stage)
-- **Web App**: `12_WebApp/frontend/` and `12_WebApp/backend/`
+- **Web App**: `webapp/frontend/` and `webapp/backend/`
 
 All file paths are standardized and managed centrally, eliminating hardcoded paths throughout the project.
+
+---
+
+## Deployment
+
+The web app is containerized via Dockerfiles in `webapp/backend/` and `webapp/frontend/`. To deploy:
+
+1. Build each image from its directory (backend image must include `pipeline.joblib`).
+2. Deploy backend and frontend as separate services (e.g. Google Cloud Run). Each Dockerfile uses the `PORT` environment variable (backend default 8000, frontend default 8080).
+3. Set the frontend service’s `API_URL` to the deployed backend URL. Restrict CORS on the backend to the frontend origin in production.
+
+The repository does not include `cloudbuild.yaml` or gcloud scripts. See `webapp/backend/README.md` and `webapp/frontend/README.md` for API and run details.
 
 ---
 
@@ -716,10 +755,6 @@ This project is for educational and research purposes. Price predictions are est
 ---
 
 <div align="center">
-
-**Made with ❤️ for Data-Driven Real Estate Decisions**
-
 ⭐ Star this repo if you find it helpful!
-
 </div>
 
