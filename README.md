@@ -37,7 +37,7 @@
 
 **Habitalytics** is an end-to-end real estate analytics platform designed specifically for the Gurgaon property market. The project leverages web scraping, advanced data preprocessing, feature engineering, and machine learning to provide:
 
-- **Accurate Price Predictions** using ML models
+- **Accurate Price Predictions** using ML models (R² = 0.87, MAE = 0.45 Crores)
 - **Interactive Analytics Dashboard** with comprehensive visualizations
 - **Intelligent Apartment Recommendations** based on location and preferences
 
@@ -558,6 +558,7 @@ The project implements and compares multiple regression models to select the bes
   - `min_samples_split`: [2, 5, 10, 15]
   - `min_samples_leaf`: [1, 2, 4, 6]
 - **Final Model**: Random Forest with 200 estimators (optimized hyperparameters: max_depth=25, max_samples=0.6, max_features=0.8)
+- **Holdout Performance**: R² = 0.87, MAE = 0.45 Crores (original price scale)
 
 ### Model Selection Criteria
 - **R² Score** - Coefficient of determination
