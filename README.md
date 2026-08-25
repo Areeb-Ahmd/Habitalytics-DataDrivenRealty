@@ -1,761 +1,481 @@
-# Habitalytics - Real Estate Analytics Platform
+# Habitalytics
 
-<div align="center">
+[![Python Version](https://img.shields.io/badge/Python-3.12--slim-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115.0-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.50.0-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.7.2-F7931E?style=flat-square&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
+[![Pandas](https://img.shields.io/badge/Pandas-2.3.3-150458?style=flat-square&logo=pandas&logoColor=white)](https://pandas.pydata.org)
+[![Plotly](https://img.shields.io/badge/Plotly-6.3.1-3F4F75?style=flat-square&logo=plotly&logoColor=white)](https://plotly.com)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Stage-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
 
-![Habitalytics](https://img.shields.io/badge/Habitalytics-Data%20Driven%20Realty-5fcf7c?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.50.0-FF4B4B?style=for-the-badge&logo=streamlit)
-![Machine Learning](https://img.shields.io/badge/ML-Scikit--Learn-orange?style=for-the-badge&logo=scikit-learn)
-
-**A comprehensive real estate analytics platform combining Data Science, Machine Learning, and Real Estate Intelligence for Gurgaon properties**
-
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Project Structure](#-project-structure) • [Technologies](#-technologies)
-
-</div>
+Habitalytics is a machine learning–powered real estate analytics platform focused on the Gurugram (Gurgaon) property market, designed to analyze, visualize, and predict real estate trends. It integrates predictive price modeling, interactive exploratory data analysis, and an intelligent property recommendation system into a full-stack web application.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [Overview](#-overview)
-- [Features](#-features)
-- [Project Structure](#-project-structure)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Technologies](#-technologies)
-- [Data Pipeline](#-data-pipeline)
-- [Machine Learning Models](#-machine-learning-models)
-- [Web Application](#-web-application)
-- [Configuration](#-configuration)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [Contact](#-contact)
-
----
-
-## 🎯 Overview
-
-**Habitalytics** is an end-to-end real estate analytics platform designed specifically for the Gurgaon property market. The project leverages web scraping, advanced data preprocessing, feature engineering, and machine learning to provide:
-
-- **Accurate Price Predictions** using ML models (R² = 0.87, MAE = 0.45 Crores)
-- **Interactive Analytics Dashboard** with comprehensive visualizations
-- **Intelligent Apartment Recommendations** based on location and preferences
-
-The platform is built for **home buyers, real estate investors, property sellers, and market analysts** to make data-driven property decisions.
+- [Overview](#overview)
+- [System Architecture](#system-architecture)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Repository Structure](#repository-structure)
+- [Machine Learning & Model Benchmarking](#machine-learning--model-benchmarking)
+- [Data Pipeline](#data-pipeline)
+- [Getting Started & Local Development](#getting-started--local-development)
+- [Configuration & Environment Variables](#configuration--environment-variables)
+- [API Reference & Data Contracts](#api-reference--data-contracts)
+- [Containerization & Deployment](#containerization--deployment)
+- [Contributing](#contributing)
+- [License & Disclaimer](#license--disclaimer)
+- [Author & Contact](#author--contact)
 
 ---
 
-## Features
+## Overview
 
-### Price Predictor
-- Predict property prices across Gurgaon using ML models
-- Considers location, area, furnishing, amenities, and market trends
-- Provides instant price estimates for buying or renting decisions
+Real estate market participants frequently encounter non-transparent property valuations, unstructured listings, and subjective pricing assessments. Habitalytics resolves these challenges by providing:
 
-### Analytics Dashboard
-- Sector-wise interactive visualizations
-- Price trend analysis
-- Property distribution insights
-- Market dynamics exploration
-- Word clouds and feature analysis
-
-### Property Recommender
-- Personalized property recommendations using content-based filtering
-- Location-based filtering with radius search (in kilometers)
-- **Cosine Similarity**: Multiple similarity matrices (facilities-based, price-based, location-based) combined with weighted scoring
-- **TF-IDF Vectorization**: Property features and amenities converted to vectors for similarity computation
-- Multi-factor property matching (amenities, features, location advantages)
+- **Predictive Property Valuation**: Automated price estimation powered by a tuned Random Forest regression pipeline evaluating 12 physical and spatial attributes.
+- **Exploratory Market Analytics**: Interactive sector-level visualizations detailing spatial price-per-sqft distributions, built-up area correlations, BHK configurations, and amenity frequencies.
+- **Hybrid Recommendation Engine**: Distance-radius spatial queries combined with weighted multi-factor cosine similarity scoring across property amenities, configuration patterns, and landmark proximity.
 
 ---
 
-## 📁 Project Structure
+## System Architecture
+
+### Predictive Price Valuation Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User (Browser)
+    participant F as Frontend (Streamlit)
+    participant B as Backend (FastAPI)
+    participant M as ML Pipeline (joblib)
+
+    U->>F: Enter 12 property attributes & submit
+    F->>F: Validate input payload (built_up_area > 0)
+    F->>B: POST /predict (JSON payload)
+    B->>B: Validate & normalize schema via Pydantic
+    B->>B: Assemble structured DataFrame with correct dtypes
+    B->>M: pipeline.predict(DataFrame)
+    M-->>B: Log-scale price prediction
+    B->>B: Compute expm1(prediction)
+    B->>B: Calculate uncertainty bounds: base_price ± 0.22 Cr
+    B-->>F: JSON {base_price, lower_range, upper_range}
+    F-->>U: Render formatted price estimation card
+```
+
+### Recommendation Engine Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User (Browser)
+    participant F as Frontend (Streamlit)
+    participant D as Precomputed Artifacts
+
+    alt Nearby Search Mode
+        U->>F: Select Sector & Target Radius (km)
+        F->>D: Query location_distance.pkl (distance < radius_km * 1000)
+        D-->>F: Filtered nearby property listings
+        F-->>U: Display sector property cards with exact distances
+    else Similarity-Based Mode
+        U->>F: Select Target Property
+        F->>D: Compute Weighted Score: (0.5 * Sim1) + (0.8 * Sim2) + (1.0 * Sim3)
+        D-->>F: Top 5 ranked similar properties
+        F->>D: Join property_images.csv & link_loc.pkl
+        F-->>U: Display recommendations with similarity metrics, images, and listing URLs
+    end
+```
+
+---
+
+## Key Features
+
+- **Property Valuation Engine**: Evaluates 12 input features (property type, sector, bedrooms, bathrooms, balconies, age of possession, built-up area, servant room, store room, furnishing type, luxury category, and floor category) to return a base price in Indian Crores (₹) with a ±0.22 Cr confidence interval.
+- **Interactive Analytics Dashboard**:
+  - Geospatial scatter map of sector-wise price per sqft rendered via Plotly and OpenStreetMap tiles.
+  - Amenity extraction rendered via sector-level dynamic word clouds.
+  - Built-up area versus price scatter plots segmented by BHK configurations.
+  - Sector-level and overall BHK distribution pie charts and price spread box plots.
+  - Comparative histograms evaluating price spreads between flats and independent houses.
+- **Dual Recommendation Modes**:
+  - **Nearby Search**: Radius-based spatial search within a user-defined kilometer threshold using pairwise sector distance calculations.
+  - **Similarity Search**: Weighted content-based filtering combining precomputed cosine similarity matrices for amenities (weight: 0.5), configuration patterns (weight: 0.8), and landmark proximity (weight: 1.0).
+- **Listing Asset Resolution**: Scraped 99acres listing assets dynamically mapped to properties with fallback placeholder handling.
+
+---
+
+## Tech Stack
+
+| Layer | Component | Version | Purpose |
+|---|---|---|---|
+| **Runtime & Language** | Python | `>= 3.8` (Docker: `3.12-slim`) | Core execution environment |
+| **Backend API** | FastAPI | `0.115.0` | Asynchronous REST API routing |
+| **ASGI Server** | Uvicorn (standard) | `0.30.6` | Production ASGI server |
+| **Data Validation** | Pydantic | `2.9.2` | Request and response schema enforcement |
+| **Frontend UI** | Streamlit | `1.50.0` | Analytical user interface |
+| **UI Components** | streamlit-option-menu | `0.4.0` | Multi-page sidebar navigation |
+| **Machine Learning** | scikit-learn | `1.7.2` | Core inference pipeline (Random Forest) |
+| **Model Experimentation** | XGBoost | `>= 1.7.0` | Benchmark model evaluation in notebooks |
+| **Categorical Encoding** | category-encoders | `2.9.0` | Target and categorical feature transformations |
+| **Model Serialization** | joblib | `1.4.2` | Pipeline artifact persistence (`pipeline.joblib`) |
+| **Data Processing** | pandas / numpy | `2.3.3` / `2.3.4` | Tabular data manipulation and vector math |
+| **Statistical Analysis** | scipy | `>= 1.10.0` | Statistical distributions and testing |
+| **Geospatial & Charts** | Plotly | `6.3.1` | Geospatial tile maps and interactive charts |
+| **Visual Rendering** | Matplotlib / Seaborn | `3.10.7` / `0.13.2` | Statistical plots and word clouds |
+| **Word Cloud Engine** | wordcloud | `1.9.4` | Sector amenity frequency visual rendering |
+| **Web Scraping** | BeautifulSoup4 / Requests | `4.12.2` / `2.28.2` | Offline listing scraping from 99acres |
+| **Browser Automation** | Selenium | `4.16.0` | Dynamic listing extraction pipelines |
+| **Geocoding** | Geopy (Nominatim) | Latest | Sector coordinate geocoding via OpenStreetMap |
+| **Storage Architecture** | File-Based Artifacts | N/A | Persistent `.csv`, `.pkl`, and `.joblib` storage |
+
+---
+
+## Repository Structure
 
 ```
 Habitalytics/
-│
-├── config/                          # Configuration package
-│   ├── __init__.py                  # Package initialization
-│   └── paths.py                     # Centralized path management
-│
-├── data/                            # All data files (centralized)
-│   ├── raw/                         # Raw scraped data
-│   │   ├── flats.csv
-│   │   ├── houses.csv
-│   │   └── appartments.csv
-│   ├── processed/                   # Processed datasets
-│   │   ├── flats_cleaned.csv
-│   │   ├── house_cleaned.csv
-│   │   ├── gurgaon_properties.csv
-│   │   ├── gurgaon_properties_cleaned_v1.csv
-│   │   ├── gurgaon_properties_cleaned_v2.csv
-│   │   ├── gurgaon_properties_outlier_treated.csv
-│   │   ├── gurgaon_properties_missing_value_imputation.csv
-│   │   ├── gurgaon_properties_post_feature_selection.csv
-│   │   └── gurgaon_properties_post_feature_selection_v2.csv
-│   ├── analytics/                   # Analytics datasets
-│   │   ├── data_viz1.csv
-│   │   ├── latlong.csv
-│   │   └── sector_coordinates.csv
-│   └── recommender/                 # Recommender datasets
-│       ├── appartments.csv
-│       └── property_images.csv
-│
-├── models/                          # All model files (centralized)
-│   ├── pipeline.joblib              # Trained ML pipeline
-│   ├── df.pkl                       # Processed dataset
-│   ├── cosine_sim1.pkl              # Similarity matrices
-│   ├── cosine_sim2.pkl
-│   ├── cosine_sim3.pkl
-│   ├── location_distance.pkl
-│   ├── link_loc.pkl
-│   ├── feature_text.pkl
-│   └── wordcloud_df.pkl
-│
-├── notebooks/                       # Jupyter notebooks (organized by stage)
-│   ├── 01_data_collection/
-│   │   └── 99_acres_scrap.py
-│   ├── 02_preprocessing/
-│   │   ├── data-preprocessing-flats.ipynb
-│   │   ├── data-preprocessing-houses.ipynb
-│   │   ├── data-preprocessing-level-2.ipynb
-│   │   └── merge-flats-and-house.ipynb
-│   ├── 03_feature_engineering/
-│   │   └── feature-engineering.ipynb
-│   ├── 04_eda/
-│   │   ├── eda-univariate-analysis.ipynb
-│   │   └── eda-multivariate-analysis.ipynb
-│   ├── 05_outlier_detection/
-│   │   └── outlier-treatment.ipynb
-│   ├── 06_missing_value_imputation/
-│   │   └── missing-value-imputation.ipynb
-│   ├── 07_feature_selection/
-│   │   ├── feature-selection_1.ipynb
-│   │   └── feature-selection_2.ipynb
-│   ├── 08_baseline_model/
-│   │   └── baseline-model.ipynb
-│   ├── 09_model_selection/
-│   │   └── model-selection.ipynb
-│   ├── 10_analytics/
-│   │   └── data-visualization.ipynb
-│   ├── 11_recommender/
-│   │   └── recommender-system.ipynb
-│   └── requirements.txt
-│
-├── scripts/                         # Utility scripts
-│   ├── 99_acres_scrap.py
-│   ├── generate_images.py
-│   └── latlong_scraper.py
-│
-├── webapp/                          # Web application
-│   ├── backend/
-│   │   ├── api.py                   # FastAPI backend service
-│   │   ├── Dockerfile               # Container image (Python 3.12, PORT default 8000)
-│   │   ├── pipeline.joblib          # ML model pipeline (copy)
-│   │   ├── requirements.txt
-│   │   └── README.md
-│   │
-│   └── frontend/
-│       ├── Home.py                  # Main Streamlit application
-│       ├── sidebar.py               # Sidebar navigation
-│       ├── Dockerfile               # Container image (Python 3.12, PORT default 8080)
-│       ├── requirements.txt
-│       ├── df.pkl                   # Dataset for dropdown options
-│       ├── sector_coordinates.csv
-│       ├── static/                  # theme.css, sidebar.js
-│       ├── datasets/                # Required datasets and models
-│       │   ├── cosine_sim1.pkl
-│       │   ├── cosine_sim2.pkl
-│       │   ├── cosine_sim3.pkl
-│       │   ├── data_viz1.csv
-│       │   ├── feature_text.pkl
-│       │   ├── link_loc.pkl
-│       │   ├── location_distance.pkl
-│       │   ├── wordcloud_df.pkl
-│       │   ├── property_images.csv
-│       │   └── [logo images]
-│       └── pages/
-│           ├── Property_Valuation.py
-│           ├── Analytics_Dashboard.py
-│           └── Property_Recommender.py
-│
-├── pyproject.toml                   # Package configuration
-└── README.md                        # This file
+├── pyproject.toml                         # Project metadata & build definitions (Python >= 3.8)
+├── config/                                # Centralized configuration package
+│   ├── __init__.py                        # Path constant exports
+│   └── paths.py                           # Root directory detection & data path definitions
+├── data/                                  # Centralized data storage
+│   ├── raw/                               # Raw scraped CSVs (flats.csv, houses.csv, appartments.csv)
+│   ├── processed/                         # Cleaned/engineered datasets across 9 pipeline stages
+│   ├── analytics/                         # Dashboard analytics datasets & sector coordinates
+│   └── recommender/                       # Recommender metadata and asset mapping datasets
+├── models/                                # Serialized models and similarity matrices
+│   ├── pipeline.joblib                    # Trained Random Forest regression pipeline (~42 MB)
+│   ├── cosine_sim{1,2,3}.pkl             # Precomputed cosine similarity matrices
+│   ├── df.pkl                             # UI feature reference dataset
+│   ├── feature_text.pkl                   # Text embeddings and feature mappings
+│   ├── link_loc.pkl                       # Property-to-listing URL mapping
+│   ├── location_distance.pkl              # Pairwise sector distance matrix
+│   └── wordcloud_df.pkl                   # Tokenized sector amenity dataset
+├── notebooks/                             # 11-stage research and machine learning pipeline
+│   ├── 01_data_collection/               # 99acres scraping scripts
+│   ├── 02_preprocessing/                 # Data cleaning and record merges
+│   ├── 03_feature_engineering/           # Attribute extraction and transformation
+│   ├── 04_eda/                           # Exploratory data analysis
+│   ├── 05_outlier_detection/              # Outlier detection and treatment
+│   ├── 06_missing_value_imputation/       # Missing value strategies
+│   ├── 07_feature_selection/             # Feature importance analysis
+│   ├── 08_baseline_model/                 # Benchmark modeling
+│   ├── 09_model_selection/                # Final pipeline evaluation and export
+│   ├── 10_analytics/                      # Analytics data preparation
+│   ├── 11_recommender/                    # Recommender matrix construction
+│   └── requirements.txt                   # Notebook-specific environment dependencies
+├── scripts/                               # Standalone automation and extraction utilities
+│   ├── 99_acres_scrap.py                  # Listing scraper with rate-limiting controls
+│   ├── latlong_scraper.py                 # Sector coordinate geocoder (Nominatim)
+│   └── generate_images.py                 # Listing image extractor
+└── webapp/                                # Production application code
+    ├── .streamlit/
+    │   └── config.toml                    # Streamlit server and dark theme configuration
+    ├── backend/                           # FastAPI service
+    │   ├── api.py                         # REST API application and prediction endpoints
+    │   ├── pipeline.joblib                # Serialized model artifact for container build
+    │   ├── Dockerfile                     # Multi-stage production build (Python 3.12-slim)
+    │   ├── requirements.txt               # Backend runtime dependencies
+    │   └── README.md
+    └── frontend/                          # Streamlit analytical client
+        ├── Home.py                        # Web application entry point
+        ├── sidebar.py                     # Navigation configuration module
+        ├── df.pkl                         # Dropdown reference data
+        ├── sector_coordinates.csv         # Sector mapping coordinates
+        ├── Dockerfile                     # Multi-stage frontend build (Python 3.12-slim)
+        ├── requirements.txt               # Frontend runtime dependencies
+        ├── README.md
+        ├── static/
+        │   ├── theme.css                  # Custom dark theme and responsive stylesheet
+        │   └── sidebar.js                 # Dynamic DOM adjustments
+        ├── datasets/                      # Static runtime analytical and recommender assets
+        │   ├── cosine_sim{1,2,3}.pkl
+        │   ├── data_viz1.csv
+        │   ├── feature_text.pkl
+        │   ├── link_loc.pkl
+        │   ├── location_distance.pkl
+        │   ├── wordcloud_df.pkl
+        │   ├── property_images.csv
+        │   └── logo4_upscaled.jpg
+        └── pages/
+            ├── Analytics_Dashboard.py     # Market visualization module
+            ├── Property_Valuation.py      # ML valuation client interface
+            └── Property_Recommender.py    # Spatial & similarity recommendation interface
 ```
-
-**Note**: All notebooks use the centralized `config` package for path management. Data files are stored in `data/` and model files in `models/` directories, eliminating redundant copies.
 
 ---
 
-## 🚀 Installation
+## Machine Learning & Model Benchmarking
 
-### Prerequisites
+### Model Evaluation & Selection
 
-- Python 3.8 or higher
-- pip (Python package installer)
-- Git (for cloning the repository)
+11 regression algorithms were benchmarked using 10-fold cross-validation on the engineered dataset:
 
-### Step 1: Clone the Repository
+| Algorithm | Model Description | Status |
+|---|---|---|
+| **Linear Regression** | Baseline ordinary least squares | Evaluated |
+| **Support Vector Regressor (SVR)** | Support Vector Regression with RBF kernel | Evaluated |
+| **Ridge Regression** | Linear regression with L2 regularization | Evaluated |
+| **Lasso Regression** | Linear regression with L1 regularization | Evaluated |
+| **Decision Tree Regressor** | Non-linear decision tree | Evaluated |
+| **Random Forest Regressor** | Optimized ensemble of decision trees | **Selected Final Model** |
+| **Extra Trees Regressor** | Extremely randomized decision trees | Evaluated |
+| **Gradient Boosting Regressor** | Sequential gradient boosted decision trees | Evaluated |
+| **AdaBoost Regressor** | Adaptive boosting ensemble | Evaluated |
+| **Multi-Layer Perceptron (MLP)** | Feedforward neural network regressor | Evaluated |
+| **XGBoost Regressor** | Extreme Gradient Boosting framework | Evaluated |
 
-```bash
-git clone https://github.com/yourusername/Habitalytics.git
-cd Habitalytics
-```
+### Final Model Performance & Hyperparameters
 
-### Step 2: Install Configuration Package
+- **Holdout Evaluation Metrics**:
+  - **R² Score**: `0.87`
+  - **Mean Absolute Error (MAE)**: `0.45 Crores (₹)`
+- **Hyperparameter Optimization (`RandomizedSearchCV`)**:
+  - `n_estimators`: `200`
+  - `max_depth`: `25`
+  - `max_samples`: `0.6`
+  - `max_features`: `0.8`
+  - `min_samples_split`: `2`
+  - `min_samples_leaf`: `1`
 
-Install the project's configuration package in editable mode to enable centralized path management:
+### Inference Pipeline Transformations
 
-```bash
-pip install -e .
-```
-
-This installs the `habitalytics-config` package, allowing all notebooks and scripts to import paths from the `config` module.
-
-### Step 3: Navigate to Frontend Directory
-
-```bash
-cd webapp/frontend
-```
-
-### Step 4: Create Virtual Environment
-
-**Windows:**
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-**Linux/Mac:**
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### Step 5: Install Frontend Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Step 6: Setup Backend API (Optional but Recommended)
-
-For the Property Valuation feature to work, you need to run the backend API:
-
-1. Navigate to backend directory (from repo root: `webapp/backend`):
-   ```bash
-   cd webapp/backend
-   ```
-
-2. Install backend dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Ensure `pipeline.joblib` is present in the backend directory
-
-4. Run the API server:
-   ```bash
-   python api.py
-   ```
-   Or with uvicorn:
-   ```bash
-   uvicorn api:app --host 0.0.0.0 --port 8000
-   ```
-
-5. Set environment variable for frontend (in a new terminal):
-   ```bash
-   # Windows
-   $env:API_URL="http://localhost:8000"
-   
-   # Linux/Mac
-   export API_URL=http://localhost:8000
-   ```
-
-### Step 7: Verify Installation
-
-Ensure all required files are present:
-- Configuration package installed (`pip install -e .`)
-- `webapp/frontend/Home.py`
-- `webapp/frontend/df.pkl`
-- `webapp/frontend/datasets/` folder with all pickle files and CSVs
-- `webapp/frontend/pages/` folder with all page modules
-- `data/` directory with all data files
-- `models/` directory with all model files
-
-### Running with Docker (containerized)
-
-Backend and frontend each have a `Dockerfile` in `webapp/backend/` and `webapp/frontend/`. There is no `docker-compose` in the project; run the two containers separately.
-
-**Backend** (ensure `pipeline.joblib` is in `webapp/backend/` before building):
-
-```bash
-cd webapp/backend
-docker build -t habitalytics-backend .
-docker run -p 8000:8000 -e PORT=8000 habitalytics-backend
-```
-
-**Frontend** (in another terminal; set `API_URL` to the backend URL the browser or frontend container can reach):
-
-```bash
-cd webapp/frontend
-docker build -t habitalytics-frontend .
-docker run -p 8080:8080 -e PORT=8080 -e API_URL=http://localhost:8000 habitalytics-frontend
-```
-
-Frontend app: `http://localhost:8080`. Backend API: `http://localhost:8000`. If the frontend runs in Docker and the backend on the host, use the host’s address (e.g. `http://host.docker.internal:8000` on Docker Desktop) for `API_URL`.
-
-The Dockerfiles use `PORT` (backend default 8000, frontend default 8080) and are suitable for platforms like Google Cloud Run; the repository does not include `cloudbuild.yaml` or gcloud deployment scripts.
-
----
-
-## 💻 Usage
-
-### Working with Notebooks
-
-All notebooks use the centralized `config` package for path management. To use notebooks:
-
-1. **Install the configuration package** (if not already installed):
-   ```bash
-   pip install -e .
-   ```
-
-2. **Import paths in your notebook**:
-   ```python
-   from config import DATA_RAW, DATA_PROCESSED, DATA_ANALYTICS, DATA_RECOMMENDER, MODELS_DIR, PROJECT_ROOT
-   ```
-
-3. **Use standardized paths**:
-   ```python
-   # Read data
-   df = pd.read_csv(DATA_PROCESSED / 'gurgaon_properties_cleaned_v1.csv')
-   
-   # Save models
-   joblib.dump(model, MODELS_DIR / 'pipeline.joblib')
-   
-   # Save processed data
-   df.to_csv(DATA_PROCESSED / 'output.csv', index=False)
-   ```
-
-This ensures all file operations use consistent paths regardless of where the notebook is located.
-
-### Running the Web Application
-
-1. **Activate your virtual environment** (if not already activated):
-   ```bash
-   # Windows
-   .venv\Scripts\activate
-   
-   # Linux/Mac
-   source .venv/bin/activate
-   ```
-
-2. **Navigate to the frontend directory**:
-   ```bash
-   cd webapp/frontend
-   ```
-   
-3. **Start the backend API** (in a separate terminal, if using Property Valuation):
-   ```bash
-   cd webapp/backend
-   python api.py
-   ```
-
-4. **Run the Streamlit application**:
-   ```bash
-   streamlit run Home.py
-   ```
-
-5. **Access the application**:
-   - The app will automatically open in your default web browser
-   - Default URL: `http://localhost:8501`
-   - Backend API (if running): `http://localhost:8000`
-
-### Using the Application
-
-#### Home Page
-- Overview of the platform
-- Navigation to different modules
-- Information about features and benefits
-
-#### Property Valuation
-1. **Ensure backend API is running** (see Setup Step 5)
-2. Select property details:
-   - Property type (flat/house)
-   - Sector (location in Gurgaon)
-   - Bedrooms, Bathrooms, Balconies
-   - Built-up area (in sqft)
-   - Property age/Possession status
-   - Furnishing type
-   - Floor category (Low/Mid/High)
-   - Additional rooms (servant room, store room)
-   - Luxury category
-3. Click **"Predict Price"** to get instant price prediction with:
-   - Base price estimate
-   - Lower range (22% below base - conservative estimate)
-   - Upper range (22% above base - optimistic estimate)
-
-#### Analytics Dashboard
-- **Sector-wise Price Map**: Interactive map showing average prices per sqft across sectors
-- **Features Word Cloud**: Visualize most common amenities by sector
-- **Built-up Area vs Price**: Scatter plots showing price-area relationships
-- **BHK Distribution**: Pie charts showing bedroom configuration distribution
-- **Price Comparison**: Box plots comparing prices across different BHK configurations
-- **Price Distribution**: Side-by-side histograms for houses vs flats
-
-#### Property Recommender
-1. **Select Location and Radius**:
-   - Choose a location (sector) from dropdown
-   - Set search radius in kilometers
-   - Click "Search" to find properties in the area
-2. **Get Recommendations**:
-   - Select an apartment from the search results
-   - Click "Recommend" to get similar properties
-   - View recommendations with similarity scores
-   - Access property listings on 99acres.com
-3. **Recommendation Factors**:
-   - Location proximity (distance-based)
-   - Similar amenities and features (TF-IDF + Cosine Similarity)
-   - Price range similarity
-   - Property characteristics matching
-
----
-
-## Technologies
-
-### Core Technologies
-- **Python 3.x** - Programming language
-- **Streamlit** - Web application framework
-- **Pandas** - Data manipulation and analysis
-- **NumPy** - Numerical computing
-
-### Machine Learning
-- **Scikit-learn** - ML algorithms and preprocessing
-- **XGBoost** - Gradient boosting framework
-- Models tested:
-  - Linear Regression
-  - Support Vector Regression (SVR)
-  - Ridge Regression
-  - Lasso Regression
-  - Decision Tree Regressor
-  - Random Forest Regressor
-  - Extra Trees Regressor
-  - Gradient Boosting Regressor
-  - AdaBoost Regressor
-  - Multi-Layer Perceptron (MLP)
-  - XGBoost Regressor
-
-### Data Visualization
-- **Plotly** - Interactive visualizations
-- **Matplotlib** - Static plotting
-- **Seaborn** - Statistical visualizations
-- **WordCloud** - Text visualization
-
-### Web Scraping
-- **BeautifulSoup4** - HTML parsing
-- **Selenium** - Web automation
-- **Requests** - HTTP library
-
-### Data Processing
-- **Pickle** - Model serialization
-- **Retrying** - Retry mechanisms for web scraping
+- **Numerical Features**: `StandardScaler` applied to built-up area, bedroom, bathroom, servant room, and store room counts.
+- **Categorical Features**: `OrdinalEncoder` applied to `property_type`, `balcony`, `furnishing_type`, `luxury_category`, and `floor_category`.
+- **Nominal Features**: `OneHotEncoder` applied to `agePossession`.
+- **High-Cardinality Locations**: `TargetEncoder` (from `category-encoders`) applied to Gurugram sectors.
+- **Target Variable**: Log-transformed via `log1p` during training; inverse-transformed via `expm1(prediction)` at inference.
 
 ---
 
 ## Data Pipeline
 
-### 1. Data Collection
-- **Web Scraping**: Built custom scraper using BeautifulSoup4 and Requests library
-- Extracted property details from 99acres.com including:
-  - Property information (name, type, price, area)
-  - Configuration (bedrooms, bathrooms, balconies, additional rooms)
-  - Location details (sector, address, nearby locations)
-  - Features and amenities (furnishing details, property features)
-  - Property metadata (age/possession, floor number, facing direction)
-- Implemented rate limiting and random delays to prevent IP blocking
-- Data stored in CSV format in `data/raw/` directory (flats.csv, houses.csv, appartments.csv)
+The data engineering and model training workflow is structured across 11 sequential stages in `notebooks/`:
 
-### 2. Data Preprocessing
-- Handling missing values
-- Data type conversions
-- Merging datasets (flats and houses)
-- Initial cleaning and standardization
-
-### 3. Feature Engineering
-- **Area Feature Extraction**: Extracted Super Built-up, Built-up, and Carpet area from text using regex patterns
-- **Derived Features**: Created luxury category (Low/Medium/High) and floor category (Low/Mid/High) from numerical scores
-- **Additional Rooms**: Extracted binary features for servant room, store room, study room, pooja room from text data
-- **Text Processing**: Used MultiLabelBinarizer to convert amenities and features lists into binary feature matrices
-- **Categorical Encoding**: Applied OrdinalEncoder, OneHotEncoder, and TargetEncoder for different categorical features
-- **Feature Transformations**: Log transformation for target variable to handle price distribution skewness
-
-### 4. Exploratory Data Analysis (EDA)
-- Univariate analysis
-- Multivariate analysis
-- Correlation analysis
-- Distribution analysis
-
-### 5. Outlier Detection & Treatment
-- **IQR Method**: Used Interquartile Range (IQR) method for outlier detection
-- Statistical analysis of price and price_per_sqft distributions
-- Outlier removal/treatment to improve data quality and model performance
-
-### 6. Missing Value Imputation
-- **Statistical Imputation**: Used median ratios for area-related features (super_built_up_area, built_up_area, carpet_area)
-- Calculated conversion ratios from complete data to impute missing values
-- Handling missing categorical and numerical features with domain-specific strategies
-
-### 7. Feature Selection
-- Feature importance analysis
-- Dimensionality reduction
-- Optimal feature subset selection
-
-### 8. Model Development
-- Baseline model creation
-- Multiple model comparison (11 regression models tested)
-- 10-fold cross-validation for robust evaluation
-- Hyperparameter tuning using RandomizedSearchCV
-- Model selection based on performance metrics (R², MAE)
-- **Final Model**: Random Forest Regressor (optimized with 200 estimators)
-
-### 9. Model Deployment
-- Pipeline creation
-- Model serialization (joblib and pickle)
-- Models stored in centralized `models/` directory
-- Integration with web application
-- **Path Management**: All notebooks use the `config` package for standardized file paths
+```
+01_data_collection           Automated 99acres listing and asset extraction
+       │
+02_preprocessing             Data cleaning, deduplication, and schema merge for flats and houses
+       │
+03_feature_engineering       Creation of derived metrics (luxury score, floor category)
+       │
+04_eda                       Univariate, bivariate, and spatial distribution analysis
+       │
+05_outlier_detection         Interquartile Range (IQR) detection and treatment on price/sqft
+       │
+06_missing_value_imputation  Domain-specific ratio imputation for area measurements
+       │
+07_feature_selection         Feature importance ranking and multicollinearity reduction
+       │
+08_baseline_model            Comparative algorithmic benchmarking across 11 regression models
+       │
+09_model_selection           Hyperparameter optimization and export to pipeline.joblib
+       │
+10_analytics                 Dataset preparation for frontend dashboards and map layers
+       │
+11_recommender               Computation of pairwise distance and 3 cosine similarity matrices
+```
 
 ---
 
-## Machine Learning Models
+## Getting Started & Local Development
 
-**Final Model**: Random Forest Regressor (optimized with hyperparameter tuning)
+### Prerequisites
 
-The project implements and compares multiple regression models to select the best performing one:
+- **Python**: Version `3.8+` (`3.12` recommended)
+- **pip**: Latest Python package manager
+- **Model Artifact**: `pipeline.joblib` located in `webapp/backend/`
+- **Data Assets**: Serialized `.pkl` and `.csv` files inside `webapp/frontend/datasets/`
 
-| Model | Description |
-|-------|-------------|
-| **Linear Regression** | Baseline linear model |
-| **SVR** | Support Vector Regression with RBF kernel |
-| **Ridge** | L2 regularization |
-| **Lasso** | L1 regularization |
-| **Decision Tree** | Tree-based non-linear model |
-| **Random Forest** ⭐ | Ensemble of decision trees (Final Selected Model) |
-| **Extra Trees** | Extremely Randomized Trees |
-| **Gradient Boosting** | Sequential ensemble method |
-| **AdaBoost** | Adaptive Boosting |
-| **MLP** | Multi-Layer Perceptron neural network |
-| **XGBoost** | Extreme Gradient Boosting |
-
-### Model Selection Process
-- **Evaluation**: All 11 models were evaluated using 10-fold cross-validation
-- **Metrics**: Performance assessed using R² Score and Mean Absolute Error (MAE)
-- **Final Selection**: **Random Forest Regressor** was selected as the final model after comprehensive comparison
-- **Hyperparameter Tuning**: RandomizedSearchCV was used to optimize Random Forest parameters:
-  - `n_estimators`: [200, 300, 400, 500]
-  - `max_depth`: [15, 20, 25, 30]
-  - `max_samples`: [0.4, 0.5, 0.6, 0.7]
-  - `max_features`: [None, 'sqrt', 0.6, 0.8]
-  - `min_samples_split`: [2, 5, 10, 15]
-  - `min_samples_leaf`: [1, 2, 4, 6]
-- **Final Model**: Random Forest with 200 estimators (optimized hyperparameters: max_depth=25, max_samples=0.6, max_features=0.8)
-- **Holdout Performance**: R² = 0.87, MAE = 0.45 Crores (original price scale)
-
-### Model Selection Criteria
-- **R² Score** - Coefficient of determination
-- **Mean Absolute Error (MAE)** - Prediction accuracy
-- **Cross-Validation** - 10-fold CV for robust evaluation
-
-### Preprocessing Pipeline
-- **StandardScaler** for numerical features (bedrooms, bathrooms, built-up area, servant room, store room)
-- **OrdinalEncoder** for categorical features (property_type, balcony, furnishing_type, luxury_category, floor_category)
-- **OneHotEncoder** for agePossession feature
-- **TargetEncoder** (category_encoders) for sector encoding (high-cardinality categorical feature)
-- **Log transformation** (log1p) for target variable (price) to handle skewness
-- **PCA** (optional) for dimensionality reduction
+> Note: Running the web application requires no external API keys. Internet access is only needed if executing the offline scrapers against 99acres or Nominatim.
 
 ---
 
-## 🌐 Web Application
+### Local Installation Steps
 
-### Architecture
-- **Frontend**: Streamlit (Python-based web framework)
-- **Backend**: FastAPI (RESTful API for ML predictions)
-- **Data Storage**: Pickle files (.pkl), CSV files, and Joblib models
-- **Communication**: HTTP REST API between frontend and backend
+1. **Clone the repository and install the config package:**
+   ```bash
+   git clone [https://github.com/Areeb-Ahmd/Habitalytics-DataDrivenRealty.git](https://github.com/Areeb-Ahmd/Habitalytics-DataDrivenRealty.git)
+   cd Habitalytics
+   pip install -e .
+   ```
 
-### Frontend Pages
+2. **Start the Backend API (Terminal 1):**
+   ```bash
+   cd webapp/backend
+   pip install -r requirements.txt
+   python api.py
+   ```
+   - API Endpoint: `http://localhost:8000`
+   - Swagger UI Documentation: `http://localhost:8000/docs`
+   - ReDoc Interface: `http://localhost:8000/redoc`
 
-#### 1. Home (`Home.py`)
-- Landing page with project overview
-- Navigation menu using `streamlit-option-menu`
-- Feature highlights and benefits
-- Contact information and developer details
-- **Mobile Responsive**: Optimized CSS for mobile devices (≤768px)
+3. **Start the Frontend Application (Terminal 2):**
+   ```bash
+   cd webapp/frontend
+   pip install -r requirements.txt
 
-#### 2. Property Valuation (`pages/Property_Valuation.py`)
-- Interactive form for property details
-- Real-time price prediction via FastAPI backend
-- Price range display (lower, base, upper)
-- Property summary with all entered details
-- Field guide with tooltips for each input field
+   # Linux / macOS:
+   export API_URL="http://localhost:8000"
 
-#### 3. Analytics Dashboard (`pages/Analytics_Dashboard.py`)
-- Interactive maps (Plotly scatter_mapbox) showing sector-wise prices
-- Word clouds for property features by sector
-- Scatter plots (Built-up Area vs Price)
-- Pie charts (BHK distribution)
-- Box plots (Price comparison by BHK)
-- Side-by-side histograms (Price distribution by property type)
+   # Windows (PowerShell):
+   $env:API_URL="http://localhost:8000"
 
-#### 4. Property Recommender (`pages/Property_Recommender.py`)
-- Location-based property search with radius filtering
-- Content-based recommendation system
-- Multiple similarity matrices (weighted combination)
-- Property cards with images, similarity scores, and direct links
-- Integration with 99acres.com listings
+   # Windows (CMD):
+   set API_URL=http://localhost:8000
 
-### Backend API
+   streamlit run Home.py
+   ```
+   - Access the dashboard at `http://localhost:8501`.
 
-#### FastAPI Service (`backend/api.py`)
-- **Endpoints**:
-  - `GET /` - API status and information
-  - `GET /health` - Health check endpoint
-  - `POST /predict` - Property price prediction
-- **CORS**: Enabled for cross-origin requests from Streamlit frontend
-- **Model Loading**: Loads `pipeline.joblib` at startup
-- **Response Format**: JSON with base_price, lower_range, upper_range
+4. **Working with Research Notebooks:**
+   The repository uses a centralized path configuration package (`config/`):
+   ```python
+   from config import DATA_RAW, DATA_PROCESSED, DATA_ANALYTICS, DATA_RECOMMENDER, MODELS_DIR, PROJECT_ROOT
+   import pandas as pd
+   import joblib
 
----
+   # Load processed data
+   df = pd.read_csv(DATA_PROCESSED / 'gurgaon_properties_cleaned_v1.csv')
 
-## Dataset Information
-
-### Data Source
-- **Website**: 99acres.com
-- **Location**: Gurgaon, India
-- **Property Types**: Flats, Houses, Apartments
-
-### Key Features
-- Property details (bedrooms, bathrooms, area)
-- Location information (sector, address)
-- Pricing information
-- Amenities and features
-- Furnishing details
-- Age/Possession status
-- Nearby locations
-
-### Data Quality
-- Comprehensive preprocessing pipeline
-- Outlier treatment
-- Missing value imputation
-- Feature engineering for enhanced predictive power
+   # Persist trained model
+   joblib.dump(model, MODELS_DIR / 'pipeline.joblib')
+   ```
 
 ---
 
-## 🔧 Configuration
+## Configuration & Environment Variables
 
 ### Environment Variables
 
-#### Frontend
-- `API_URL` (optional): Backend API URL (default: `http://localhost:8000`)
-  - Set this if backend is running on a different host/port
-  - Example: `export API_URL=https://your-backend.onrender.com`
+| Variable | Scope | Required | Default Value | Description |
+|---|---|---|---|---|
+| `API_URL` | Frontend | No | `http://localhost:8000` | Backend API base URL used for `/predict` calls |
+| `PORT` | Backend | No | `8000` | Server listen port (auto-injected in Cloud Run) |
+| `PORT` | Frontend | No | `8080` | Streamlit port in Docker (auto-injected in Cloud Run) |
 
-#### Backend
-- `PORT` (optional): Server port (default: 8000). Read in `webapp/backend/api.py`; used by the backend Dockerfile and deployment platforms (e.g. Cloud Run)
+### Streamlit Configuration (`webapp/.streamlit/config.toml`)
 
-### File Paths
+| Section | Key | Value | Description |
+|---|---|---|---|
+| `[server]` | `runOnSave` | `true` | Auto-reloads UI when code files change |
+| `[server]` | `fileWatcherType` | `"auto"` | Automatic file system watcher mode |
+| `[runner]` | `fastReruns` | `true` | Optimizes script execution graph reruns |
+| `[runner]` | `magicEnabled` | `true` | Enables Streamlit magic commands |
+| `[client]` | `showErrorDetails` | `true` | Displays detailed error tracebacks |
+| `[theme]` | `primaryColor` | `#5fcf7c` | Emerald green platform accent |
+| `[theme]` | `backgroundColor` | `#0e1117` | Primary dark background canvas |
+| `[theme]` | `secondaryBackgroundColor` | `#262730` | Container and sidebar panel background |
+| `[theme]` | `textColor` | `#ffffff` | Primary text styling |
 
-The project uses a centralized path management system through the `config` package. All notebooks and scripts import paths from `config`:
+---
 
-```python
-from config import DATA_RAW, DATA_PROCESSED, DATA_ANALYTICS, DATA_RECOMMENDER, MODELS_DIR, PROJECT_ROOT
+## API Reference & Data Contracts
+
+### HTTP Endpoints
+
+| Method | Endpoint | Description | Authentication |
+|---|---|---|---|
+| `GET` | `/` | Root service health check and operational status | None |
+| `GET` | `/health` | Detailed probe reporting model initialization state | None |
+| `POST` | `/predict` | Property valuation inference using 12 input features | None |
+| `GET` | `/docs` | Interactive Swagger UI API explorer | None |
+| `GET` | `/redoc` | ReDoc OpenAPI documentation | None |
+
+---
+
+### Valuation Data Contracts
+
+#### Request Payload (`POST /predict`)
+
+```json
+{
+  "property_type": "flat",
+  "sector": "Sector 1",
+  "bedRoom": 2.0,
+  "bathroom": 2.0,
+  "balcony": "2",
+  "agePossession": "New Property",
+  "built_up_area": 1200.0,
+  "servant_room": 0.0,
+  "store_room": 1.0,
+  "furnishing_type": "Semi-Furnished",
+  "luxury_category": "Medium",
+  "floor_category": "Mid"
+}
 ```
 
-**Key Directories:**
-- **Data files**: `data/raw/`, `data/processed/`, `data/analytics/`, `data/recommender/`
-- **Model files**: `models/` directory
-- **Notebooks**: `notebooks/` directory (organized by stage)
-- **Web App**: `webapp/frontend/` and `webapp/backend/`
+#### Response Payload (`POST /predict`)
 
-All file paths are standardized and managed centrally, eliminating hardcoded paths throughout the project.
+```json
+{
+  "base_price": 1.45,
+  "lower_range": 1.23,
+  "upper_range": 1.67
+}
+```
 
----
-
-## Deployment
-
-The web app is containerized via Dockerfiles in `webapp/backend/` and `webapp/frontend/`. To deploy:
-
-1. Build each image from its directory (backend image must include `pipeline.joblib`).
-2. Deploy backend and frontend as separate services (e.g. Google Cloud Run). Each Dockerfile uses the `PORT` environment variable (backend default 8000, frontend default 8080).
-3. Set the frontend service’s `API_URL` to the deployed backend URL. Restrict CORS on the backend to the frontend origin in production.
-
-The repository does not include `cloudbuild.yaml` or gcloud scripts. See `webapp/backend/README.md` and `webapp/frontend/README.md` for API and run details.
+*Note: All output prices are computed in Indian Crores (₹) via `expm1(prediction)` with an uncertainty margin of `±0.22 Cr`.*
 
 ---
 
-## 🤝 Contributing
+## Containerization & Deployment
 
-Contributions are welcome! Please follow these steps:
+Both services feature multi-stage Docker builds based on `python:3.12-slim`.
 
-1. Fork the repository
+### 1. Backend Service Build & Run
+
+```bash
+cd webapp/backend
+docker build -t habitalytics-backend .
+docker run -d -p 8000:8000 -e PORT=8000 habitalytics-backend
+```
+*System Dependencies Included*: `libgomp1` (required for OpenMP multi-threading in scikit-learn).
+
+### 2. Frontend Service Build & Run
+
+```bash
+cd webapp/frontend
+docker build -t habitalytics-frontend .
+docker run -d -p 8080:8080 \
+  -e PORT=8080 \
+  -e API_URL=[http://host.docker.internal:8000](http://host.docker.internal:8000) \
+  habitalytics-frontend
+```
+*System Dependencies Included*: `fonts-dejavu-core`, `libfreetype6`, `libpng16-16` (required for Matplotlib and WordCloud rendering).
+
+### Cloud Deployment Notes
+
+- **Target Platform**: Google Cloud Run (services bind dynamically to `$PORT`).
+- **Artifact Preparation**: Ensure `pipeline.joblib` is present in `webapp/backend/` and all `.pkl` / `.csv` assets are inside `webapp/frontend/datasets/` prior to building container images.
+- **CORS Configuration**: Restrict `allow_origins=["*"]` in `api.py` to the production frontend domain for public deployment.
+
+---
+
+## Contributing
+
+1. Fork the repository (`https://github.com/Areeb-Ahmd/Habitalytics-DataDrivenRealty`)
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-### Contribution Guidelines
-- Follow PEP 8 style guide
-- Add comments for complex logic
-- Update documentation as needed
-- Test your changes thoroughly
-
 ---
 
-## 📝 License
+## License & Disclaimer
 
+### License
 This project is open source and available under the [MIT License](LICENSE).
 
----
-
-## 👤 Contact
-
-**Syed Areeb Ahmad**
-
-- 📧 Email: [ahmad.syedareeb7@gmail.com](mailto:ahmad.syedareeb7@gmail.com)
-- 💼 LinkedIn: [areeb-ahmad7](https://www.linkedin.com/in/areeb-ahmad7)
-- 🐙 GitHub: [Areeb-Ahmd](https://github.com/Areeb-Ahmd)
+### Disclaimer
+This platform is developed for educational and research purposes. Valuations and recommendations are estimates generated from historical data patterns and must not be considered formal financial, appraisal, or legal advice.
 
 ---
 
-## 🙏 Acknowledgments
+## Author & Contact
 
-- **99acres.com** - Data source
-- **Streamlit** - Web framework
-- **Scikit-learn** - Machine learning library
-- **Open-source community** - For various Python packages
-
----
-
-## 📈 Future Enhancements
-
-- [ ] Expand to other cities (Delhi, Noida, etc.)
-- [ ] Real-time data updates
-- [ ] User authentication and saved searches
-- [ ] Mobile app version
-- [ ] Advanced ML models (Deep Learning)
-- [ ] Property comparison feature
-- [ ] Investment ROI calculator
-- [ ] Market trend forecasting
-
----
-
-## ⚠️ Disclaimer
-
-This project is for educational and research purposes. Price predictions are estimates based on historical data and should not be considered as financial or investment advice. Always consult with real estate professionals for actual property transactions.
-
----
-
-<div align="center">
-⭐ Star this repo if you find it helpful!
-</div>
-
+- **Syed Areeb Ahmad**
+- **Email**: [ahmad.syedareeb7@gmail.com](mailto:ahmad.syedareeb7@gmail.com)
+- **LinkedIn**: [areeb-ahmad7](https://www.linkedin.com/in/areeb-ahmad7)
+- **GitHub**: [@Areeb-Ahmd](https://github.com/Areeb-Ahmd)
