@@ -229,21 +229,21 @@ Habitalytics/
 ### Final Model Performance & Hyperparameters
 
 - **Holdout Evaluation Metrics**:
-  - **R² Score**: `0.87`
-  - **Mean Absolute Error (MAE)**: `0.45 Crores (₹)`
+  - **R² Score**: `0.8630`
+  - **Mean Absolute Error (MAE)**: `0.4726 Crores (₹)`
 - **Hyperparameter Optimization (`RandomizedSearchCV`)**:
-  - `n_estimators`: `200`
-  - `max_depth`: `25`
-  - `max_samples`: `0.6`
-  - `max_features`: `0.8`
+  - `n_estimators`: `400`
+  - `max_depth`: `20`
+  - `max_samples`: `0.7`
+  - `max_features`: `0.6`
   - `min_samples_split`: `2`
   - `min_samples_leaf`: `1`
 
 ### Inference Pipeline Transformations
 
 - **Numerical Features**: `StandardScaler` applied to built-up area, bedroom, bathroom, servant room, and store room counts.
-- **Categorical Features**: `OrdinalEncoder` applied to `property_type`, `balcony`, `furnishing_type`, `luxury_category`, and `floor_category`.
-- **Nominal Features**: `OneHotEncoder` applied to `agePossession`.
+- **Categorical Features**: `OrdinalEncoder` applied to `balcony`, `furnishing_type`, `luxury_category`, and `floor_category`.
+- **Nominal Features**: `OneHotEncoder(drop='if_binary')` applied to `property_type` and `OneHotEncoder(drop='first')` applied to `agePossession`.
 - **High-Cardinality Locations**: `TargetEncoder` (from `category-encoders`) applied to Gurugram sectors.
 - **Target Variable**: Log-transformed via `log1p` during training; inverse-transformed via `expm1(prediction)` at inference.
 
@@ -448,6 +448,7 @@ docker run -d -p 8080:8080 \
 ### Cloud Deployment Notes
 
 - **Target Platform**: Google Cloud Run (services bind dynamically to `$PORT`).
+- **Deployment Workflow**: Containerized multi-stage Docker builds designed for Google Cloud Run deployment via manual container registry push (`gcloud run deploy`). *Note: Automated CI/CD workflows (e.g., GitHub Actions) are not included in this repository.*
 - **Artifact Preparation**: Ensure `pipeline.joblib` is present in `webapp/backend/` and all `.pkl` / `.csv` assets are inside `webapp/frontend/datasets/` prior to building container images.
 - **CORS Configuration**: Restrict `allow_origins=["*"]` in `api.py` to the production frontend domain for public deployment.
 
